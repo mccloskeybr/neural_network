@@ -1,0 +1,21 @@
+Executing tests from //src:matrix_test
+-----------------------------------------------------------------------------
+Running main() from gmock_main.cc
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from MatrixTest
+[ RUN      ] MatrixTest.MultiplySucceed
+-3.26315e-14 74src/matrix_test.cc(19): error: Value of: a * b == expected
+  Actual: false
+Expected: true
+
+[  FAILED  ] MatrixTest.MultiplySucceed (0 ms)
+[----------] 1 test from MatrixTest (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 0 tests.
+[  FAILED  ] 1 test, listed below:
+[  FAILED  ] MatrixTest.MultiplySucceed
+
+ 1 FAILED TEST
