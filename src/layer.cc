@@ -1,8 +1,8 @@
 #include "layer.h"
 
-#include <cassert>
 #include <optional>
 
+#include "assert.h"
 #include "activation.h"
 #include "config.h"
 #include "cost.h"
@@ -33,7 +33,7 @@ void Layer::CalcPDCostWeightedInputOutput(LearnCache* cache, Matrix expected_out
 }
 
 void Layer::CalcPDCostWeightedInputIntermed(LearnCache* cache, LearnCache* next_cache) {
-  assert(next_cache->pd_cost_weighted_input.has_value());
+  ASSERT(next_cache->pd_cost_weighted_input.has_value());
   cache->pd_cost_weighted_input = Matrix(1, next_cache->layer->weights_.RowCount());
   for (int32_t i = 0; i < next_cache->layer->weights_.RowCount(); i++) {
     float pd_cost_weighted_input = 0.0f;
@@ -48,7 +48,7 @@ void Layer::CalcPDCostWeightedInputIntermed(LearnCache* cache, LearnCache* next_
 }
 
 void Layer::FinishBackPropagate(LearnCache* cache) {
-  assert(cache->pd_cost_weighted_input.has_value());
+  ASSERT(cache->pd_cost_weighted_input.has_value());
   Matrix cost_gradient_weights = Matrix(weights_.RowCount(), weights_.ColCount());
   for (int32_t c = 0; c < cost_gradient_weights.ColCount(); c++) {
     for (int32_t r = 0; r < cost_gradient_weights.RowCount(); r++) {

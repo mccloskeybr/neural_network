@@ -4,13 +4,14 @@
 #include <ostream>
 #include <vector>
 
+#include "assert.h"
 #include "matrix.h"
 
 NeuralNetwork::NeuralNetwork(
     Config cfg,
     std::vector<Matrix> weights,
     std::vector<Matrix> biases) {
-  assert(weights.size() == biases.size());
+  ASSERT(weights.size() == biases.size());
   cfg_ = std::move(cfg);
   layers_.reserve(weights.size());
   for (int32_t i = 0; i < weights.size(); i++) {

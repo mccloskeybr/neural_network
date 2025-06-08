@@ -1,13 +1,14 @@
 #include "matrix.h"
 
 #include <array>
-#include <cassert>
 #include <functional>
 #include <iostream>
 #include <ostream>
 #include <random>
 #include <string>
 #include <utility>
+
+#include "assert.h"
 
 Matrix Matrix::Random(int32_t row_count, int32_t col_count) {
   std::random_device rd{};
@@ -22,39 +23,39 @@ Matrix Matrix::Random(int32_t row_count, int32_t col_count) {
 
 Matrix Matrix::Transpose() {
   std::vector<float> result_elements;
-  result_elements.reserve(this->elements_.size());
-  for (int32_t c = 0; c < this->col_count_; c++) {
-    for (int32_t r = 0; r < this->row_count_; r++) {
-      result_elements.push_back(this->ElementAt(r, c));
+  result_elements.reserve(elements_.size());
+  for (int32_t c = 0; c < col_count_; c++) {
+    for (int32_t r = 0; r < row_count_; r++) {
+      result_elements.push_back(ElementAt(r, c));
     }
   }
   return Matrix(col_count_, row_count_, std::move(result_elements));
 }
 
 Matrix Matrix::Map(std::function<float(float)> closure) {
-  std::vector<float> elements_copy = this->elements_;
+  std::vector<float> elements_copy = elements_;
   for (float& x : elements_copy) { x = closure(x); }
   return Matrix(row_count_, col_count_, elements_copy);
 }
 
 Matrix Matrix::Merge(Matrix& other, std::function<float(float, float)> closure) {
-  assert(this->row_count_ == other.row_count_);
-  assert(this->col_count_ == other.col_count_);
+  ASSERT(row_count_ == other.row_count_);
+  ASSERT(col_count_ == other.col_count_);
   std::vector<float> result_elements;
-  result_elements.reserve(this->elements_.size());
-  for (int32_t i = 0; i < this->elements_.size(); i++) {
-    result_elements.push_back(closure(this->elements_[i], other.elements_[i]));
+  result_elements.reserve(elements_.size());
+  for (int32_t i = 0; i < elements_.size(); i++) {
+    result_elements.push_back(closure(elements_[i], other.elements_[i]));
   }
   return Matrix(row_count_, col_count_, result_elements);
 }
 
 Matrix Matrix::HadamardMult(Matrix& other) {
-  assert(this->row_count_ == other.row_count_);
-  assert(this->col_count_ == other.col_count_);
+  ASSERT(row_count_ == other.row_count_);
+  ASSERT(col_count_ == other.col_count_);
   std::vector<float> result_elements;
-  result_elements.reserve(this->elements_.size());
-  for (int32_t i = 0; i < this->elements_.size(); i++) {
-    result_elements.push_back(this->elements_[i] * other.elements_[i]);
+  result_elements.reserve(elements_.size());
+  for (int32_t i = 0; i < elements_.size(); i++) {
+    result_elements.push_back(elements_[i] * other.elements_[i]);
   }
   return Matrix(row_count_, col_count_, result_elements);
 }
@@ -66,23 +67,23 @@ Matrix Matrix::operator*(float scalar) {
 }
 
 Matrix Matrix::operator+(Matrix& other) {
-  assert(this->row_count_ == other.row_count_);
-  assert(this->col_count_ == other.col_count_);
-  std::vector<float> result_elements(this->row_count_ * this->col_count_);
+  ASSERT(row_count_ == other.row_count_);
+  ASSERT(col_count_ == other.col_count_);
+  std::vector<float> result_elements(row_count_ * col_count_);
   for (int32_t i = 0; i < result_elements.size(); i++) {
-    result_elements[i] = this->elements_[i] + other.elements_[i];
+    result_elements[i] = elements_[i] + other.elements_[i];
   }
-  return Matrix(this->row_count_, this->col_count_, std::move(result_elements));
+  return Matrix(row_count_, col_count_, std::move(result_elements));
 }
 
 Matrix Matrix::operator*(Matrix& other) {
-  assert(this->col_count_ == other.row_count_);
-  Matrix result(this->row_count_, other.col_count_);
-  for (int32_t i = 0; i < this->row_count_; i++) {
-    for (int32_t k = 0; k < this->col_count_; k++) {
+  ASSERT(col_count_ == other.row_count_);
+  Matrix result(row_count_, other.col_count_);
+  for (int32_t i = 0; i < row_count_; i++) {
+    for (int32_t k = 0; k < col_count_; k++) {
       for (int32_t j = 0; j < other.col_count_; j++) {
         result.ElementAt(i, j) +=
-          this->ElementAt(i, k) * other.ElementAt(k, j);
+          ElementAt(i, k) * other.ElementAt(k, j);
       }
     }
   }
@@ -90,10 +91,10 @@ Matrix Matrix::operator*(Matrix& other) {
 }
 
 bool Matrix::operator==(Matrix& other) {
-  assert(this->row_count_ == other.row_count_);
-  assert(this->col_count_ == other.col_count_);
-  for (int32_t i = 0; i < this->elements_.size(); i++) {
-    if (this->elements_[i] != other.elements_[i]) {
+  ASSERT(row_count_ == other.row_count_);
+  ASSERT(col_count_ == other.col_count_);
+  for (int32_t i = 0; i < elements_.size(); i++) {
+    if (elements_[i] != other.elements_[i]) {
       return false;
     }
   }
@@ -101,7 +102,7 @@ bool Matrix::operator==(Matrix& other) {
 }
 
 int32_t Matrix::Classify() {
-  assert(row_count_ == 1);
+  ASSERT(row_count_ == 1);
   int32_t idx_max = 0;
   for (int32_t i = 1; i < elements_.size(); i++) {
     if (elements_[i] > elements_[idx_max]) {
@@ -116,17 +117,17 @@ int32_t Matrix::RowCount() { return row_count_; }
 int32_t Matrix::ColCount() { return col_count_; }
 
 float& Matrix::ElementAt(int32_t r, int32_t c) {
-  assert(r < row_count_ && c < col_count_);
-  return this->elements_[(r * col_count_) + c];
+  ASSERT(r < row_count_ && c < col_count_);
+  return elements_[(r * col_count_) + c];
 }
 
 std::string Matrix::DebugString() {
   std::string result;
-  for (int32_t i = 0; i < this->row_count_; i++) {
+  for (int32_t i = 0; i < row_count_; i++) {
     result += "| ";
-    for (int32_t j = 0; j < this->col_count_; j++) {
-      result += std::to_string(this->ElementAt(i, j));
-      if (j < this->col_count_ - 1) { result += ", "; }
+    for (int32_t j = 0; j < col_count_; j++) {
+      result += std::to_string(ElementAt(i, j));
+      if (j < col_count_ - 1) { result += ", "; }
     }
     result += " |\n";
   }

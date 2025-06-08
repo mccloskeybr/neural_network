@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 
+#include "assert.h"
 #include "neural_network.h"
 #include "matrix.h"
 
@@ -37,7 +38,7 @@ int main(int argc, char* argv[]) {
     while (std::getline(stream, field, ',')) {
       input_elements.push_back(std::stof(field) / 255.0f);
     }
-    assert(input_elements.size() == 28 * 28);
+    ASSERT(input_elements.size() == 28 * 28);
 
     Matrix input = Matrix(1, 28 * 28, input_elements);
     float cost = neural_network.Learn(input, expected_class);

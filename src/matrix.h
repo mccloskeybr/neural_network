@@ -3,9 +3,10 @@
 
 #include <array>
 #include <functional>
-#include <cassert>
 #include <random>
 #include <utility>
+
+#include "assert.h"
 
 class Matrix {
  public:
@@ -18,8 +19,8 @@ class Matrix {
     row_count_(row_count),
     col_count_(col_count),
     elements_(std::move(elements)) {
-      assert(elements_.size() > 0);
-      assert(elements_.size() == row_count_ * col_count_);
+      ASSERT(elements_.size() > 0);
+      ASSERT(elements_.size() == row_count_ * col_count_);
     };
   static Matrix Random(int32_t row_count, int32_t col_count);
 

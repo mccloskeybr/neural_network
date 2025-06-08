@@ -1,11 +1,11 @@
 #ifndef SRC_LAYER_H_
 #define SRC_LAYER_H_
 
-#include <cassert>
 #include <functional>
 #include <optional>
 #include <utility>
 
+#include "assert.h"
 #include "activation.h"
 #include "config.h"
 #include "cost.h"
@@ -17,8 +17,8 @@ class Layer {
     cfg_(std::move(cfg)),
     weights_(std::move(weights)),
     biases_(std::move(biases)) {
-      assert(weights_.ColCount() == biases_.ColCount());
-      assert(biases_.RowCount() == 1);
+      ASSERT(weights_.ColCount() == biases_.ColCount());
+      ASSERT(biases_.RowCount() == 1);
     }
 
   struct LearnCache {

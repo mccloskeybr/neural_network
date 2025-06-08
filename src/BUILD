@@ -1,8 +1,16 @@
 cc_library(
+  name = "assert",
+  hdrs = ["assert.h"],
+  deps = [],
+)
+
+cc_library(
   name = "matrix",
   hdrs = ["matrix.h"],
   srcs = ["matrix.cc"],
-  deps = [],
+  deps = [
+    ":assert",
+  ],
 )
 
 cc_test(
@@ -28,14 +36,18 @@ cc_library(
   name = "cost",
   hdrs = ["cost.h"],
   srcs = ["cost.cc"],
-  deps = [],
+  deps = [
+    ":assert",
+  ],
 )
 
 cc_library(
   name = "activation",
   hdrs = ["activation.h"],
   srcs = ["activation.cc"],
-  deps = [],
+  deps = [
+    ":assert",
+  ],
 )
 
 cc_library(
@@ -43,6 +55,7 @@ cc_library(
   hdrs = ["layer.h"],
   srcs = ["layer.cc"],
   deps = [
+    ":assert",
     ":activation",
     ":config",
     ":cost",
@@ -55,6 +68,7 @@ cc_library(
   hdrs = ["neural_network.h"],
   srcs = ["neural_network.cc"],
   deps = [
+    ":assert",
     ":config",
     ":layer",
     ":matrix",
@@ -65,6 +79,7 @@ cc_binary(
   name = "main",
   srcs = ["main.cc"],
   deps = [
+    ":assert",
     ":matrix",
     ":neural_network",
   ],
