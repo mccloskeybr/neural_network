@@ -1,5 +1,5 @@
-#ifndef SRC_ASSERT_H_
-#define SRC_ASSERT_H_
+#ifndef SRC_COMMON_ASSERT_H_
+#define SRC_COMMON_ASSERT_H_
 
 #include <cassert>
 

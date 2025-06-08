@@ -3,8 +3,9 @@
 
 #include <vector>
 
-#include "config.h"
-#include "layer.h"
+#include "src/common/matrix.h"
+#include "src/neural_network/config.h"
+#include "src/neural_network/layer.h"
 
 class NeuralNetwork {
  public:

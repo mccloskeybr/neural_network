@@ -1,4 +1,4 @@
-#include "matrix.h"
+#include "src/common/matrix.h"
 
 #include <gtest/gtest.h>
 

@@ -1,9 +1,9 @@
-#include "activation.h"
+#include "src/neural_network/activation.h"
 
 #include <cmath>
 #include <functional>
 
-#include "assert.h"
+#include "src/common/assert.h"
 
 float Sigmoid(float x) {
   return 1.0f / (1.0f + std::exp(-x));

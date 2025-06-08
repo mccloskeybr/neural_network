@@ -5,11 +5,11 @@
 #include <optional>
 #include <utility>
 
-#include "assert.h"
-#include "activation.h"
-#include "config.h"
-#include "cost.h"
-#include "matrix.h"
+#include "src/common/assert.h"
+#include "src/common/matrix.h"
+#include "src/neural_network/activation.h"
+#include "src/neural_network/config.h"
+#include "src/neural_network/cost.h"
 
 class Layer {
  public:

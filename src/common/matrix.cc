@@ -1,4 +1,4 @@
-#include "matrix.h"
+#include "src/common/matrix.h"
 
 #include <array>
 #include <functional>
@@ -8,7 +8,7 @@
 #include <string>
 #include <utility>
 
-#include "assert.h"
+#include "src/common/assert.h"
 
 Matrix Matrix::Random(int32_t row_count, int32_t col_count) {
   std::random_device rd{};

@@ -5,9 +5,10 @@
 #include <string>
 #include <vector>
 
-#include "assert.h"
-#include "neural_network.h"
-#include "matrix.h"
+#include "src/common/assert.h"
+#include "src/common/matrix.h"
+#include "src/io/csv_reader.h"
+#include "src/neural_network/neural_network.h"
 
 int main(int argc, char* argv[]) {
   auto neural_network = NeuralNetwork::Random(
@@ -16,33 +17,22 @@ int main(int argc, char* argv[]) {
        .learn_rate = 0.05},
       {784, 128, 64, 10});
 
-  std::ifstream file("Z:\\neural_network\\data\\mnist\\mnist_train.csv");
-  if (!file.is_open()) {
+  std::optional<CsvReader> reader = CsvReader::Open(
+      "Z:\\neural_network\\data\\mnist\\mnist_train.csv");
+  if (!reader.has_value()) {
     std::cerr << "Error opening file." << std::endl;
     exit(1);
   }
 
-  std::string line;
-  getline(file, line); // NOTE: eat headers
-  while (getline(file, line)) {
-    std::stringstream stream(line);
+  std::optional<std::pair<uint32_t, Matrix>> sample = reader->GetNextSample();
+  while (sample.has_value()) {
+    uint32_t expected_class = sample->first;
+    Matrix input = sample->second;
+    ASSERT(input.RowCount() == 1 && input.ColCount == 28 * 28);
 
-    uint32_t expected_class;
-    std::vector<float> input_elements;
-    input_elements.reserve(28 * 28);
+    neural_network.Learn(std::move(input), expected_class);
 
-    std::string field;
-    std::getline(stream, field, ',');
-    expected_class = std::stoul(field);
-
-    while (std::getline(stream, field, ',')) {
-      input_elements.push_back(std::stof(field) / 255.0f);
-    }
-    ASSERT(input_elements.size() == 28 * 28);
-
-    Matrix input = Matrix(1, 28 * 28, input_elements);
-    float cost = neural_network.Learn(input, expected_class);
-    // std::cout << "Cost: " << cost << std::endl;
+    sample = reader->GetNextSample();
   }
 
   return 0;

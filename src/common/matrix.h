@@ -1,12 +1,12 @@
-#ifndef SRC_MATRIX_H_
-#define SRC_MATRIX_H_
+#ifndef SRC_COMMON_MATRIX_H_
+#define SRC_COMMON_MATRIX_H_
 
 #include <array>
 #include <functional>
 #include <random>
 #include <utility>
 
-#include "assert.h"
+#include "src/common/assert.h"
 
 class Matrix {
  public:

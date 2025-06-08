@@ -1,11 +1,11 @@
-#include "neural_network.h"
+#include "src/neural_network/neural_network.h"
 
 #include <iostream>
 #include <ostream>
 #include <vector>
 
-#include "assert.h"
-#include "matrix.h"
+#include "src/common/assert.h"
+#include "src/common/matrix.h"
 
 NeuralNetwork::NeuralNetwork(
     Config cfg,

@@ -1,9 +1,9 @@
-#include "cost.h"
+#include "src/neural_network/cost.h"
 
 #include <cmath>
 #include <functional>
 
-#include "assert.h"
+#include "src/common/assert.h"
 
 float MeanSquaredError(float actual, float expected) {
   float error = actual - expected;

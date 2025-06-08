@@ -1,11 +1,11 @@
-#include "layer.h"
+#include "src/neural_network/layer.h"
 
 #include <optional>
 
-#include "assert.h"
-#include "activation.h"
-#include "config.h"
-#include "cost.h"
+#include "src/common/assert.h"
+#include "src/neural_network/activation.h"
+#include "src/neural_network/config.h"
+#include "src/neural_network/cost.h"
 
 int32_t Layer::InputSize() { return weights_.RowCount(); }
 
