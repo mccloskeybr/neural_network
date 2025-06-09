@@ -4,15 +4,6 @@ load("@rules_cc//cc:cc_test.bzl", "cc_test")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-  name = "config",
-  hdrs = ["config.h"],
-  deps = [
-    ":activation",
-    ":cost",
-  ],
-)
-
-cc_library(
   name = "cost",
   hdrs = ["cost.h"],
   srcs = ["cost.cc"],
@@ -36,8 +27,8 @@ cc_library(
   srcs = ["layer.cc"],
   deps = [
     ":activation",
-    ":config",
     ":cost",
+    "//src:params",
     "//src/common:assert",
     "//src/common:matrix",
   ],
@@ -48,10 +39,21 @@ cc_library(
   hdrs = ["neural_network.h"],
   srcs = ["neural_network.cc"],
   deps = [
-    ":config",
     ":layer",
+    "//src:params",
     "//src/common:assert",
     "//src/common:matrix",
   ],
 )
 
+cc_library(
+  name = "trainer",
+  hdrs = ["trainer.h"],
+  srcs = ["trainer.cc"],
+  deps = [
+    ":neural_network",
+    "//src/common:assert",
+    "//src/common:matrix",
+    "//src/io:csv_reader",
+  ],
+)

@@ -24,20 +24,21 @@ class Matrix {
     };
   static Matrix Random(int32_t row_count, int32_t col_count);
 
-  Matrix Transpose();
-  Matrix Map(std::function<float(float)> closure);
-  Matrix Merge(Matrix& other, std::function<float(float, float)> closure);
-  Matrix HadamardMult(Matrix& other);
-  Matrix operator+(Matrix& other);
-  Matrix operator*(float scalar);
-  Matrix operator*(Matrix& other);
-  bool operator==(Matrix& other);
+  Matrix Transpose() const;
+  Matrix Map(std::function<float(float)> closure) const;
+  Matrix Merge(const Matrix& other, std::function<float(float, float)> closure) const;
+  Matrix HadamardMult(const Matrix& other) const;
+  Matrix operator+(const Matrix& other) const;
+  Matrix operator*(float scalar) const;
+  Matrix operator*(const Matrix& other) const;
+  bool operator==(const Matrix& other) const;
 
-  int32_t Classify();
-  int32_t RowCount();
-  int32_t ColCount();
-  float& ElementAt(int32_t r, int32_t c);
-  std::string DebugString();
+  int32_t Classify() const;
+  int32_t RowCount() const;
+  int32_t ColCount() const;
+  float ElementAt(int32_t r, int32_t c) const;
+  float& MutableElementAt(int32_t r, int32_t c);
+  std::string DebugString() const;
 
  private:
   int32_t row_count_;

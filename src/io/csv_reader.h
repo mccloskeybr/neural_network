@@ -13,6 +13,8 @@ class CsvReader {
  public:
   static std::optional<CsvReader> Open(std::string filename);
   std::optional<std::pair<uint32_t, Matrix>> GetNextSample();
+  std::vector<std::pair<uint32_t, Matrix>> GetNextBatchSample(int32_t batch_size);
+  void Reset();
 
  protected:
   CsvReader(std::ifstream file) : file_(std::move(file)) {}

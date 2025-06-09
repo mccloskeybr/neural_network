@@ -5,41 +5,42 @@
 #include <optional>
 #include <utility>
 
+#include "src/params.h"
 #include "src/common/assert.h"
 #include "src/common/matrix.h"
 #include "src/neural_network/activation.h"
-#include "src/neural_network/config.h"
 #include "src/neural_network/cost.h"
 
 class Layer {
  public:
-  explicit Layer(Config cfg, Matrix weights, Matrix biases) :
-    cfg_(std::move(cfg)),
+  explicit Layer(Parameters* params, Matrix weights, Matrix biases) :
+    params_(params),
     weights_(std::move(weights)),
     biases_(std::move(biases)) {
       ASSERT(weights_.ColCount() == biases_.ColCount());
       ASSERT(biases_.RowCount() == 1);
     }
 
-  struct LearnCache {
-    Layer* layer;
+  struct LayerLearnCache {
+    const Layer* layer;
     Matrix input;
     Matrix w_input;
     Matrix activated;
     std::optional<Matrix> pd_cost_weighted_input;
   };
 
-  int32_t InputSize();
-  int32_t OutputSize();
+  int32_t InputSize() const;
+  int32_t OutputSize() const;
 
-  Matrix FeedForward(Matrix input, LearnCache* cache);
+  Matrix FeedForward(Matrix input, LayerLearnCache* cache) const;
 
-  void CalcPDCostWeightedInputOutput(LearnCache* cache, Matrix expected_output);
-  void CalcPDCostWeightedInputIntermed(LearnCache* cache, LearnCache* next_cache);
-  void FinishBackPropagate(LearnCache* cache);
+  void CalcPDCostWeightedInputOutput(LayerLearnCache* cache, Matrix expected_output) const;
+  void CalcPDCostWeightedInputIntermed(LayerLearnCache* cache, LayerLearnCache* next_cache) const;
+  std::pair<Matrix, Matrix> FinishBackPropagate(LayerLearnCache* cache) const;
+  void ApplyGradients(std::pair<Matrix, Matrix> gradients);
 
  private:
-  Config cfg_;
+  Parameters* params_;
   Matrix weights_;
   Matrix biases_;
 };
