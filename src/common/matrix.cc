@@ -76,6 +76,16 @@ Matrix Matrix::operator+(const Matrix& other) const {
   return Matrix(row_count_, col_count_, std::move(result_elements));
 }
 
+Matrix Matrix::operator-(const Matrix& other) const {
+  ASSERT(row_count_ == other.row_count_);
+  ASSERT(col_count_ == other.col_count_);
+  std::vector<double> result_elements(row_count_ * col_count_);
+  for (int32_t i = 0; i < result_elements.size(); i++) {
+    result_elements[i] = elements_[i] - other.elements_[i];
+  }
+  return Matrix(row_count_, col_count_, std::move(result_elements));
+}
+
 Matrix Matrix::operator*(const Matrix& other) const {
   ASSERT(col_count_ == other.row_count_);
   Matrix result(row_count_, other.col_count_);

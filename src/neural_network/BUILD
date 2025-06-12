@@ -18,6 +18,7 @@ cc_library(
   srcs = ["activation.cc"],
   deps = [
     "//src/common:assert",
+    "//src/common:matrix",
   ],
 )
 
@@ -28,7 +29,6 @@ cc_library(
   deps = [
     ":activation",
     ":cost",
-    "//src:params",
     "//src/common:assert",
     "//src/common:matrix",
   ],

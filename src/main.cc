@@ -22,12 +22,15 @@ int main(int argc, char* argv[]) {
   }
   Parameters params = {
     .layer_sizes = {784, 128, 64, 10},
-    .activation = Activation::SIGMOID,
+    .intermed_activation = Activation::SIGMOID,
+    .output_activation = Activation::SOFTMAX,
     .cost = Cost::MEAN_SQUARED,
     .learn_rate = 0.005,
+    .momentum = 0.9,
+    .regularization = 0.01,
     .num_threads = std::thread::hardware_concurrency(),
     .batch_size = 3,
-    .num_epochs = 1,
+    .num_epochs = 2,
   };
   NeuralNetwork neural_network = Train(std::move(params), std::move(*reader));
 

@@ -6,9 +6,12 @@
 
 struct Parameters {
   std::vector<uint32_t> layer_sizes;
-  Activation activation;
+  Activation intermed_activation;
+  Activation output_activation;
   Cost cost;
   double learn_rate;
+  double momentum;
+  double regularization;
   uint32_t num_threads;
   uint32_t batch_size;
   uint32_t num_epochs;

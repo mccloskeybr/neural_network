@@ -5,7 +5,6 @@
 #include <optional>
 #include <utility>
 
-#include "src/params.h"
 #include "src/common/assert.h"
 #include "src/common/matrix.h"
 #include "src/neural_network/activation.h"
@@ -13,10 +12,20 @@
 
 class Layer {
  public:
-  explicit Layer(Parameters* params, Matrix weights, Matrix biases) :
-    params_(params),
+  explicit Layer(
+      Matrix weights, Matrix biases,
+      Activation activation, Cost cost,
+      double learn_rate, double momentum,
+      double regularization) :
     weights_(std::move(weights)),
-    biases_(std::move(biases)) {
+    biases_(std::move(biases)),
+    weight_velocities_(Matrix(weights_.RowCount(), weights_.ColCount())),
+    bias_velocities_(Matrix(biases_.RowCount(), biases_.ColCount())),
+    activation_(activation),
+    cost_(cost),
+    learn_rate_(learn_rate),
+    momentum_(momentum),
+    regularization_(regularization) {
       ASSERT(weights_.ColCount() == biases_.ColCount());
       ASSERT(biases_.RowCount() == 1);
     }
@@ -40,9 +49,15 @@ class Layer {
   void ApplyGradients(std::pair<Matrix, Matrix> gradients);
 
  private:
-  Parameters* params_;
   Matrix weights_;
   Matrix biases_;
+  Matrix weight_velocities_;
+  Matrix bias_velocities_;
+  Activation activation_;
+  Cost cost_;
+  double learn_rate_;
+  double momentum_;
+  double regularization_;
 };
 
 #endif

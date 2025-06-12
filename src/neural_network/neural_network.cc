@@ -15,7 +15,12 @@ NeuralNetwork::NeuralNetwork(
   params_ = std::move(params);
   layers_.reserve(weights.size());
   for (int32_t i = 0; i < weights.size(); i++) {
-    layers_.push_back(Layer(&params_, std::move(weights[i]), std::move(biases[i])));
+    Activation activation = (i == (weights.size() - 1)) ?
+      params_.output_activation : params_.intermed_activation;
+    layers_.emplace_back(
+        std::move(weights[i]), std::move(biases[i]),
+        activation, params_.cost,
+        params_.learn_rate, params.momentum, params.regularization);
   }
 }
 
@@ -48,6 +53,8 @@ Matrix NeuralNetwork::FeedForward(Matrix input, NetworkLearnCache* cache) const 
     };
   }
   Matrix layer_value = std::move(input);
+
+
   for (int32_t i = 0; i < layers_.size(); i++) {
     layer_value = layers_[i].FeedForward(
         layer_value, cache != nullptr ? &cache->layer_caches[i] : nullptr);

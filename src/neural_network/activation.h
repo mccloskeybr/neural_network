@@ -3,11 +3,16 @@
 
 #include <functional>
 
+#include "src/common/matrix.h"
+
 enum class Activation {
   SIGMOID,
+  RELU,
+  TANH,
+  SOFTMAX,
 };
 
-std::function<double(double)> GetActivation(Activation activation);
-std::function<double(double)> GetActivationDeriv(Activation activation);
+std::function<Matrix(const Matrix&)> GetActivation(Activation activation);
+std::function<Matrix(const Matrix&)> GetActivationDeriv(Activation activation);
 
 #endif

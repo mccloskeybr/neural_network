@@ -29,6 +29,7 @@ class Matrix {
   Matrix Merge(const Matrix& other, std::function<double(double, double)> closure) const;
   Matrix HadamardMult(const Matrix& other) const;
   Matrix operator+(const Matrix& other) const;
+  Matrix operator-(const Matrix& other) const;
   Matrix operator*(double scalar) const;
   Matrix operator*(const Matrix& other) const;
   bool operator==(const Matrix& other) const;
