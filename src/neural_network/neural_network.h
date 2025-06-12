@@ -6,12 +6,15 @@
 #include "src/params.h"
 #include "src/common/matrix.h"
 #include "src/neural_network/layer.h"
+#include "src/protos/model_checkpoint.pb.h"
 
 class NeuralNetwork {
  public:
   explicit NeuralNetwork(
       Parameters params, std::vector<Matrix> weights, std::vector<Matrix> biases);
   static NeuralNetwork Random(Parameters params);
+  static NeuralNetwork FromCheckpoint(
+      const protos::ModelCheckpoint& checkpoint_proto, Parameters params);
 
   struct NetworkLearnCache {
     std::vector<Layer::LayerLearnCache> layer_caches;
@@ -27,6 +30,8 @@ class NeuralNetwork {
 
   int32_t LayersCount() const;
   const Layer& GetLayer(int32_t i) const;
+
+  protos::ModelCheckpoint ToCheckpoint() const;
 
  private:
   Parameters params_;

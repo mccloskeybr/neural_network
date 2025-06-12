@@ -38,13 +38,48 @@ NeuralNetwork NeuralNetwork::Random(Parameters params) {
   return NeuralNetwork(std::move(params), std::move(weights), std::move(biases));
 }
 
-int32_t NeuralNetwork::LayersCount() const {
-  return layers_.size();
+NeuralNetwork NeuralNetwork::FromCheckpoint(
+    const protos::ModelCheckpoint& checkpoint_proto, Parameters params) {
+  ASSERT(params.layer_sizes.size() == checkpoint_proto.layers().size());
+
+  std::vector<Matrix> weights;
+  std::vector<Matrix> biases;
+  weights.reserve(params.layer_sizes.size() - 1);
+  biases.reserve(params.layer_sizes.size() - 1);
+
+  for (int32_t i = 0; i < checkpoint_proto.layers().size(); i++) {
+    const protos::ModelCheckpoint::Layer* curr_layer = &checkpoint_proto.layers()[i];
+    const protos::ModelCheckpoint::Layer* next_layer = nullptr;
+    if (i < checkpoint_proto.layers().size() - 1) { next_layer = &checkpoint_proto.layers()[i + 1]; }
+    if (next_layer != nullptr) { ASSERT(curr_layer->col_count() == next_layer->row_count()); }
+
+    weights.emplace_back(Matrix(
+        curr_layer->row_count(), curr_layer->col_count(),
+        {curr_layer->weights().begin(), curr_layer->weights().end()}));
+    biases.emplace_back(Matrix(
+        1, curr_layer->col_count(),
+        {curr_layer->biases().begin(), curr_layer->biases().end()}));
+  }
+  return NeuralNetwork(std::move(params), std::move(weights), std::move(biases));
 }
 
-const Layer& NeuralNetwork::GetLayer(int32_t i) const {
-  return layers_[i];
+protos::ModelCheckpoint NeuralNetwork::ToCheckpoint() const {
+  protos::ModelCheckpoint checkpoint_proto;
+  for (const Layer& layer : layers_) {
+    protos::ModelCheckpoint::Layer& layer_proto = *checkpoint_proto.add_layers();;
+    layer_proto.set_row_count(layer.Weights().RowCount());
+    layer_proto.set_col_count(layer.Weights().ColCount());
+    *layer_proto.mutable_weights() =
+      {layer.Weights().Elements().begin(), layer.Weights().Elements().end()};
+    *layer_proto.mutable_biases() =
+      {layer.Biases().Elements().begin(), layer.Biases().Elements().end()};
+  }
+  return checkpoint_proto;
 }
+
+int32_t NeuralNetwork::LayersCount() const { return layers_.size(); }
+
+const Layer& NeuralNetwork::GetLayer(int32_t i) const { return layers_[i]; }
 
 Matrix NeuralNetwork::FeedForward(const Matrix& input, NetworkLearnCache* cache) const {
   if (cache != nullptr) {

@@ -28,7 +28,9 @@ class Matrix {
   Matrix HadamardMult(const Matrix& other) const;
   void HadamardMultInPlace(const Matrix& other);
   Matrix operator+(const Matrix& other) const;
+  void operator+=(const Matrix& other);
   Matrix operator-(const Matrix& other) const;
+  void operator-=(const Matrix& other);
   Matrix operator*(double scalar) const;
   Matrix operator*(const Matrix& other) const;
   bool operator==(const Matrix& other) const;
@@ -38,6 +40,7 @@ class Matrix {
   int32_t ColCount() const;
   double ElementAt(int32_t r, int32_t c) const;
   double& MutableElementAt(int32_t r, int32_t c);
+  const std::vector<double>& Elements() const;
   std::string DebugString() const;
 
  private:

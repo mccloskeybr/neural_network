@@ -10,6 +10,10 @@ int32_t Layer::InputSize() const { return weights_.RowCount(); }
 
 int32_t Layer::OutputSize() const { return weights_.ColCount(); }
 
+const Matrix& Layer::Weights() const { return weights_; }
+
+const Matrix& Layer::Biases() const { return biases_; }
+
 Matrix Layer::FeedForward(const Matrix& input, LayerLearnCache* cache) const {
   const Matrix w_input = (input * weights_);
   const Matrix activated = GetActivation(activation_)(w_input);
@@ -62,5 +66,5 @@ void Layer::ApplyGradients(const std::pair<Matrix, Matrix>& gradients) {
   bias_velocities_ =
     (bias_velocities_ * momentum_) -
     (cost_gradient_biases * learn_rate_);
-  biases_ = biases_ + bias_velocities_;
+  biases_ += bias_velocities_;
 }

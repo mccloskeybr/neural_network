@@ -1,0 +1,12 @@
+syntax = "proto3";
+package protos;
+
+message ModelCheckpoint {
+  message Layer {
+    int32 row_count = 1;
+    int32 col_count = 2;
+    repeated double weights = 3;
+    repeated double biases = 4;
+  }
+  repeated Layer layers = 1;
+}

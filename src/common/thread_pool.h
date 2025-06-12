@@ -44,6 +44,7 @@ class ThreadPool {
     cv_.notify_one();
     return future;
   }
+
  private:
   void ThreadPoll() {
     while (true) {

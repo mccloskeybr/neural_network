@@ -10,6 +10,7 @@
 #include "src/common/assert.h"
 #include "src/common/matrix.h"
 #include "src/io/csv_reader.h"
+#include "src/io/model_checkpoint.h"
 #include "src/neural_network/neural_network.h"
 #include "src/neural_network/trainer.h"
 
@@ -30,9 +31,12 @@ int main(int argc, char* argv[]) {
     .regularization = 0.0,
     .num_threads = std::thread::hardware_concurrency(),
     .batch_size = 10,
-    .num_epochs = 10,
+    .num_epochs = 1,
   };
   NeuralNetwork neural_network = Train(std::move(params), std::move(*reader));
+  WriteModelCheckpoint(
+      "Z:\\neural_network\\data\\checkpoints\\mnist.model_checkpoint.pb",
+      neural_network.ToCheckpoint());
 
   return 0;
 }

@@ -18,6 +18,7 @@ cc_binary(
     "//src/common:assert",
     "//src/common:matrix",
     "//src/io:csv_reader",
+    "//src/io:model_checkpoint",
     "//src/neural_network:neural_network",
     "//src/neural_network:trainer",
   ],

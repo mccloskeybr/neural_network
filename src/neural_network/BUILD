@@ -44,6 +44,7 @@ cc_library(
     "//src:params",
     "//src/common:assert",
     "//src/common:matrix",
+    "//src/protos:model_checkpoint_cc_proto",
   ],
 )
 

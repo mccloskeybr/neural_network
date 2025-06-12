@@ -10,3 +10,13 @@ cc_library(
     "//src/common:matrix",
   ],
 )
+
+cc_library(
+  name = "model_checkpoint",
+  hdrs = ["model_checkpoint.h"],
+  srcs = ["model_checkpoint.cc"],
+  deps = [
+    "//src/common:assert",
+    "//src/protos:model_checkpoint_cc_proto",
+  ],
+)

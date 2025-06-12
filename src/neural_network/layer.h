@@ -40,6 +40,8 @@ class Layer {
 
   int32_t InputSize() const;
   int32_t OutputSize() const;
+  const Matrix& Weights() const;
+  const Matrix& Biases() const;
 
   Matrix FeedForward(const Matrix& input, LayerLearnCache* cache) const;
 

@@ -66,6 +66,14 @@ Matrix Matrix::operator+(const Matrix& other) const {
   return Matrix(row_count_, col_count_, std::move(result_elements));
 }
 
+void Matrix::operator+=(const Matrix& other) {
+  ASSERT(row_count_ == other.row_count_);
+  ASSERT(col_count_ == other.col_count_);
+  for (int32_t i = 0; i < elements_.size(); i++) {
+    elements_[i] += other.elements_[i];
+  }
+}
+
 Matrix Matrix::operator-(const Matrix& other) const {
   ASSERT(row_count_ == other.row_count_);
   ASSERT(col_count_ == other.col_count_);
@@ -74,6 +82,14 @@ Matrix Matrix::operator-(const Matrix& other) const {
     result_elements[i] = elements_[i] - other.elements_[i];
   }
   return Matrix(row_count_, col_count_, std::move(result_elements));
+}
+
+void Matrix::operator-=(const Matrix& other) {
+  ASSERT(row_count_ == other.row_count_);
+  ASSERT(col_count_ == other.col_count_);
+  for (int32_t i = 0; i < elements_.size(); i++) {
+    elements_[i] -= other.elements_[i];
+  }
 }
 
 Matrix Matrix::operator*(const Matrix& other) const {
@@ -123,6 +139,10 @@ double Matrix::ElementAt(int32_t r, int32_t c) const {
 double& Matrix::MutableElementAt(int32_t r, int32_t c) {
   ASSERT(r < row_count_ && c < col_count_);
   return elements_[(r * col_count_) + c];
+}
+
+const std::vector<double>& Matrix::Elements() const {
+  return elements_;
 }
 
 std::string Matrix::DebugString() const {
