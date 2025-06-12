@@ -4,17 +4,17 @@
 #include <functional>
 
 #include "src/common/assert.h"
+#include "src/common/matrix.h"
 
-double MeanSquaredError(double actual, double expected) {
-  double error = actual - expected;
-  return 0.5f * error * error;
+Matrix MeanSquaredError(const Matrix& actual, const Matrix& expected) {
+  return (actual - expected) * 0.5;
 }
 
-double MeanSquaredErrorDeriv(double actual, double expected) {
-  return actual - expected;
+Matrix MeanSquaredErrorDeriv(const Matrix& actual, const Matrix& expected) {
+  return (actual - expected);
 }
 
-std::function<double(double, double)> GetCost(Cost cost) {
+std::function<Matrix(const Matrix&, const Matrix&)> GetCost(Cost cost) {
   using enum Cost;
   switch (cost) {
     case MEAN_SQUARED: { return MeanSquaredError; }
@@ -22,7 +22,7 @@ std::function<double(double, double)> GetCost(Cost cost) {
   }
 }
 
-std::function<double(double, double)> GetCostDeriv(Cost cost) {
+std::function<Matrix(const Matrix&, const Matrix&)> GetCostDeriv(Cost cost) {
   using enum Cost;
   switch (cost) {
     case MEAN_SQUARED: { return MeanSquaredErrorDeriv; }

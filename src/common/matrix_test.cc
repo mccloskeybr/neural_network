@@ -64,47 +64,6 @@ TEST(MatrixTest, HadamardMultiplySucceed) {
   EXPECT_TRUE(a.HadamardMult(b) == expected);
 }
 
-TEST(MatrixTest, TransposeSucceed) {
-  auto x = Matrix(2, 3, {
-        1, 2, 3,
-        4, 5, 6,
-      });
-  auto expected = Matrix(3, 2, {
-      1, 4,
-      2, 5,
-      3, 6,
-      });
-  EXPECT_TRUE(x.Transpose() == expected);
-}
-
-TEST(MatrixTest, MapSucceed) {
-  auto x = Matrix(2, 3, {
-        1, 2, 3,
-        4, 5, 6,
-      });
-  auto expected = Matrix(2, 3, {
-        10, 20, 30,
-        40, 50, 60,
-      });
-  EXPECT_TRUE(x.Map([](double x) { return x * 10; }) == expected);
-}
-
-TEST(MatrixTest, MergeSucceed) {
-  auto x = Matrix(2, 2, {
-        1, 2,
-        3, 4,
-      });
-  auto y = Matrix(2, 2, {
-        10, 20,
-        30, 40,
-      });
-  auto expected = Matrix(2, 2, {
-        11, 22,
-        33, 44,
-      });
-  EXPECT_TRUE(x.Merge(y, [](double x, double y) { return x + y; }) == expected);
-}
-
 TEST(MatrixTest, ClassifySucceed) {
   auto x = Matrix(1, 5, {0, -1, 0, 1, 0.5 });
   EXPECT_TRUE(x.Classify() == 3);

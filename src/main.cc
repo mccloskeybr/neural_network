@@ -21,16 +21,16 @@ int main(int argc, char* argv[]) {
     exit(1);
   }
   Parameters params = {
-    .layer_sizes = {784, 128, 64, 10},
+    .layer_sizes = {784, 200, 80, 10},
     .intermed_activation = Activation::SIGMOID,
     .output_activation = Activation::SOFTMAX,
     .cost = Cost::MEAN_SQUARED,
-    .learn_rate = 0.005,
-    .momentum = 0.9,
-    .regularization = 0.01,
+    .learn_rate = 0.05,
+    .momentum = 0.5,
+    .regularization = 0.0,
     .num_threads = std::thread::hardware_concurrency(),
-    .batch_size = 3,
-    .num_epochs = 2,
+    .batch_size = 10,
+    .num_epochs = 10,
   };
   NeuralNetwork neural_network = Train(std::move(params), std::move(*reader));
 

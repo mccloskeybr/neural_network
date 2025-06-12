@@ -29,7 +29,7 @@ Matrix Layer::FeedForward(const Matrix input, LayerLearnCache* cache) const {
 }
 
 void Layer::CalcPDCostWeightedInputOutput(LayerLearnCache* cache, const Matrix expected_output) const {
-  const Matrix pd_cost_activation = cache->activated.Merge(expected_output, GetCostDeriv(cost_));
+  const Matrix pd_cost_activation = GetCostDeriv(cost_)(cache->activated, expected_output);
   const Matrix pd_activation_weighted_input = GetActivationDeriv(activation_)(cache->w_input);
   cache->pd_cost_weighted_input = pd_cost_activation.HadamardMult(pd_activation_weighted_input);
 }

@@ -21,34 +21,6 @@ Matrix Matrix::Random(int32_t row_count, int32_t col_count) {
   return Matrix(row_count, col_count, std::move(result_elements));
 }
 
-Matrix Matrix::Transpose() const {
-  std::vector<double> result_elements;
-  result_elements.reserve(elements_.size());
-  for (int32_t c = 0; c < col_count_; c++) {
-    for (int32_t r = 0; r < row_count_; r++) {
-      result_elements.push_back(ElementAt(r, c));
-    }
-  }
-  return Matrix(col_count_, row_count_, std::move(result_elements));
-}
-
-Matrix Matrix::Map(std::function<double(double)> closure) const {
-  std::vector<double> elements_copy = elements_;
-  for (double& x : elements_copy) { x = closure(x); }
-  return Matrix(row_count_, col_count_, elements_copy);
-}
-
-Matrix Matrix::Merge(const Matrix& other, std::function<double(double, double)> closure) const {
-  ASSERT(row_count_ == other.row_count_);
-  ASSERT(col_count_ == other.col_count_);
-  std::vector<double> result_elements;
-  result_elements.reserve(elements_.size());
-  for (int32_t i = 0; i < elements_.size(); i++) {
-    result_elements.push_back(closure(elements_[i], other.elements_[i]));
-  }
-  return Matrix(row_count_, col_count_, result_elements);
-}
-
 Matrix Matrix::HadamardMult(const Matrix& other) const {
   ASSERT(row_count_ == other.row_count_);
   ASSERT(col_count_ == other.col_count_);

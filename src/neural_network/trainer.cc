@@ -52,8 +52,13 @@ WorkerOutput TrainPartition(
     uint32_t expected_class = samples[i].first;
     Matrix input = std::move(samples[i].second);
 
-    // TODO: apply this directly to file data, this is specific to the MNIST data set.
-    input = input.Map([](double x) { return x / 255.0f; } );
+    // TODO/SPEEDUP: apply this directly to file data, this is specific to the MNIST data set.
+    for (int32_t r = 0; r < input.RowCount(); r++) {
+      for (int32_t c = 0; c < input.ColCount(); c++) {
+        double& x = input.MutableElementAt(r, c);
+        x /= 255.0;
+      }
+    }
     Matrix expected_output = Matrix(1, 10);
     expected_output.MutableElementAt(0, expected_class) = 1.0f;
 
@@ -122,7 +127,7 @@ void TrainEpoch(
 
     epoch_stats.total_correct_inferences_ += batch_stats.total_correct_inferences_;
     epoch_stats.total_inferences_ += batch_stats.total_inferences_;
-    std::cout << epoch_stats.ToString();
+    // std::cout << epoch_stats.ToString();
 
     batch = reader.GetNextBatchSample(params.batch_size);
   }

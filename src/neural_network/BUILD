@@ -9,6 +9,7 @@ cc_library(
   srcs = ["cost.cc"],
   deps = [
     "//src/common:assert",
+    "//src/common:matrix",
   ],
 )
 

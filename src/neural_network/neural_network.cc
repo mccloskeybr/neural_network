@@ -66,14 +66,16 @@ std::vector<std::pair<Matrix, Matrix>> NeuralNetwork::BackPropagate(
     Matrix actual_output, Matrix expected_output, NetworkLearnCache* cache) const {
   ASSERT(cache != nullptr);
 
-  layers_[layers_.size() - 1].CalcPDCostWeightedInputOutput(
-      &cache->layer_caches[cache->layer_caches.size() - 1], expected_output);
+  std::vector<std::pair<Matrix, Matrix>> gradients(layers_.size());
+
+  int32_t output_idx = layers_.size() - 1;
+  layers_[output_idx].CalcPDCostWeightedInputOutput(
+      &cache->layer_caches[output_idx], expected_output);
+  gradients[output_idx] = layers_[output_idx].FinishBackPropagate(
+      &cache->layer_caches[cache->layer_caches.size() - 1]);
   for (int32_t i = layers_.size() - 2; i >= 0; i--) {
     layers_[i].CalcPDCostWeightedInputIntermed(
         &cache->layer_caches[i], &cache->layer_caches[i + 1]);
-  }
-  std::vector<std::pair<Matrix, Matrix>> gradients(layers_.size());
-  for (int32_t i = 0; i < layers_.size(); i++) {
     gradients[i] = layers_[i].FinishBackPropagate(&cache->layer_caches[i]);
   }
 

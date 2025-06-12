@@ -24,9 +24,6 @@ class Matrix {
     };
   static Matrix Random(int32_t row_count, int32_t col_count);
 
-  Matrix Transpose() const;
-  Matrix Map(std::function<double(double)> closure) const;
-  Matrix Merge(const Matrix& other, std::function<double(double, double)> closure) const;
   Matrix HadamardMult(const Matrix& other) const;
   Matrix operator+(const Matrix& other) const;
   Matrix operator-(const Matrix& other) const;
