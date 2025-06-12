@@ -48,6 +48,19 @@ TEST(MatrixTest, MatMultiplySucceed) {
   EXPECT_TRUE(a * b == expected);
 }
 
+TEST(MatrixTest, TransposeSucceed) {
+  auto a = Matrix(2, 3, {
+        1, 2, 3,
+        4, 5, 6,
+      });
+  auto expected = Matrix(3, 2, {
+        1, 4,
+        2, 5,
+        3, 6,
+      });
+  EXPECT_TRUE(a.Transpose() == expected);
+}
+
 TEST(MatrixTest, HadamardMultiplySucceed) {
   auto a = Matrix(2, 3, {
         1, 2, 3,
@@ -62,6 +75,23 @@ TEST(MatrixTest, HadamardMultiplySucceed) {
         44, 60, 78,
       });
   EXPECT_TRUE(a.HadamardMult(b) == expected);
+}
+
+TEST(MatrixTest, HadamardMultiplyInPlaceSucceed) {
+  auto a = Matrix(2, 3, {
+        1, 2, 3,
+        4, 5, 6,
+      });
+  auto b = Matrix(2, 3, {
+        7, 8, 9,
+        11, 12, 13,
+      });
+  auto expected = Matrix(2, 4, {
+        7, 16, 27,
+        44, 60, 78,
+      });
+  a.HadamardMultInPlace(b);
+  EXPECT_TRUE(a == expected);
 }
 
 TEST(MatrixTest, ClassifySucceed) {

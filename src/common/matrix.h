@@ -24,7 +24,9 @@ class Matrix {
     };
   static Matrix Random(int32_t row_count, int32_t col_count);
 
+  Matrix Transpose() const;
   Matrix HadamardMult(const Matrix& other) const;
+  void HadamardMultInPlace(const Matrix& other);
   Matrix operator+(const Matrix& other) const;
   Matrix operator-(const Matrix& other) const;
   Matrix operator*(double scalar) const;

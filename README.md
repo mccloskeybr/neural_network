@@ -11,7 +11,5 @@ Feature set:
 
 TODO:
 * Feature: non-static learning rate, momentum
-* Feature: revisit neural net calculus for potential use of proper linear algebra
 * Speedup: matrix operation performance boosting
 * Speedup: could multithread back prop for weights vs. biases instead of both
-* Speedup: centralized thread pool instead of spawning threads all the time

@@ -46,15 +46,13 @@ const Layer& NeuralNetwork::GetLayer(int32_t i) const {
   return layers_[i];
 }
 
-Matrix NeuralNetwork::FeedForward(Matrix input, NetworkLearnCache* cache) const {
+Matrix NeuralNetwork::FeedForward(const Matrix& input, NetworkLearnCache* cache) const {
   if (cache != nullptr) {
     *cache = NetworkLearnCache {
       .layer_caches = std::vector<Layer::LayerLearnCache>(layers_.size()),
     };
   }
-  Matrix layer_value = std::move(input);
-
-
+  Matrix layer_value = input;
   for (int32_t i = 0; i < layers_.size(); i++) {
     layer_value = layers_[i].FeedForward(
         layer_value, cache != nullptr ? &cache->layer_caches[i] : nullptr);
@@ -63,9 +61,8 @@ Matrix NeuralNetwork::FeedForward(Matrix input, NetworkLearnCache* cache) const 
 }
 
 std::vector<std::pair<Matrix, Matrix>> NeuralNetwork::BackPropagate(
-    Matrix actual_output, Matrix expected_output, NetworkLearnCache* cache) const {
+    const Matrix& actual_output, const Matrix& expected_output, NetworkLearnCache* cache) const {
   ASSERT(cache != nullptr);
-
   std::vector<std::pair<Matrix, Matrix>> gradients(layers_.size());
 
   int32_t output_idx = layers_.size() - 1;
@@ -82,9 +79,9 @@ std::vector<std::pair<Matrix, Matrix>> NeuralNetwork::BackPropagate(
   return gradients;
 }
 
-void NeuralNetwork::ApplyGradients(std::vector<std::pair<Matrix, Matrix>> gradients) {
+void NeuralNetwork::ApplyGradients(const std::vector<std::pair<Matrix, Matrix>>& gradients) {
   ASSERT(gradients.size() == layers_.size());
   for (int32_t i = 0; i < gradients.size(); i++) {
-    layers_[i].ApplyGradients(std::move(gradients[i]));
+    layers_[i].ApplyGradients(gradients[i]);
   }
 }

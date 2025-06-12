@@ -41,12 +41,12 @@ class Layer {
   int32_t InputSize() const;
   int32_t OutputSize() const;
 
-  Matrix FeedForward(Matrix input, LayerLearnCache* cache) const;
+  Matrix FeedForward(const Matrix& input, LayerLearnCache* cache) const;
 
-  void CalcPDCostWeightedInputOutput(LayerLearnCache* cache, Matrix expected_output) const;
+  void CalcPDCostWeightedInputOutput(LayerLearnCache* cache, const Matrix& expected_output) const;
   void CalcPDCostWeightedInputIntermed(LayerLearnCache* cache, LayerLearnCache* next_cache) const;
   std::pair<Matrix, Matrix> FinishBackPropagate(LayerLearnCache* cache) const;
-  void ApplyGradients(std::pair<Matrix, Matrix> gradients);
+  void ApplyGradients(const std::pair<Matrix, Matrix>& gradients);
 
  private:
   Matrix weights_;

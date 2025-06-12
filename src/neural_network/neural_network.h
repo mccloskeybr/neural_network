@@ -18,10 +18,12 @@ class NeuralNetwork {
   };
 
   Matrix FeedForward(
-      Matrix input, NetworkLearnCache* cache) const;
+      const Matrix& input, NetworkLearnCache* cache) const;
   std::vector<std::pair<Matrix, Matrix>> BackPropagate(
-      Matrix actual_output, Matrix expected_output, NetworkLearnCache* cache) const;
-  void ApplyGradients(std::vector<std::pair<Matrix, Matrix>> gradients);
+      const Matrix& actual_output, const Matrix& expected_output,
+      NetworkLearnCache* cache) const;
+  void ApplyGradients(
+      const std::vector<std::pair<Matrix, Matrix>>& gradients);
 
   int32_t LayersCount() const;
   const Layer& GetLayer(int32_t i) const;

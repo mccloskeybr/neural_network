@@ -21,6 +21,16 @@ Matrix Matrix::Random(int32_t row_count, int32_t col_count) {
   return Matrix(row_count, col_count, std::move(result_elements));
 }
 
+Matrix Matrix::Transpose() const {
+  Matrix result = Matrix(col_count_, row_count_);
+  for (int32_t c = 0; c < col_count_; c++) {
+    for (int32_t r = 0; r < row_count_; r++) {
+      result.MutableElementAt(c, r) = ElementAt(r, c);
+    }
+  }
+  return result;
+}
+
 Matrix Matrix::HadamardMult(const Matrix& other) const {
   ASSERT(row_count_ == other.row_count_);
   ASSERT(col_count_ == other.col_count_);
@@ -30,6 +40,14 @@ Matrix Matrix::HadamardMult(const Matrix& other) const {
     result_elements.push_back(elements_[i] * other.elements_[i]);
   }
   return Matrix(row_count_, col_count_, result_elements);
+}
+
+void Matrix::HadamardMultInPlace(const Matrix& other) {
+  ASSERT(row_count_ == other.row_count_);
+  ASSERT(col_count_ == other.col_count_);
+  for (int32_t i = 0; i < elements_.size(); i++) {
+    elements_[i] *= other.elements_[i];
+  }
 }
 
 Matrix Matrix::operator*(double scalar) const {

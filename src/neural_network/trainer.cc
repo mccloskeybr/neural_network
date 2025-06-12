@@ -50,7 +50,7 @@ WorkerOutput TrainPartition(
   worker_output.gradients.reserve(neural_network->LayersCount());
   for (int32_t i = 0; i < samples.size(); i++) {
     uint32_t expected_class = samples[i].first;
-    Matrix input = std::move(samples[i].second);
+    Matrix& input = samples[i].second;
 
     // TODO/SPEEDUP: apply this directly to file data, this is specific to the MNIST data set.
     for (int32_t r = 0; r < input.RowCount(); r++) {
@@ -63,12 +63,12 @@ WorkerOutput TrainPartition(
     expected_output.MutableElementAt(0, expected_class) = 1.0f;
 
     NeuralNetwork::NetworkLearnCache cache = {};
-    Matrix model_output = neural_network->FeedForward(std::move(input), &cache);
+    Matrix model_output = neural_network->FeedForward(input, &cache);
     worker_output.stats.total_correct_inferences_ =
       (model_output.Classify() == expected_output.Classify());
     worker_output.stats.total_inferences_++;
     worker_output.gradients.emplace_back(neural_network->BackPropagate(
-        std::move(model_output), std::move(expected_output), &cache));
+        model_output, expected_output, &cache));
   }
   return worker_output;
 }
@@ -127,7 +127,7 @@ void TrainEpoch(
 
     epoch_stats.total_correct_inferences_ += batch_stats.total_correct_inferences_;
     epoch_stats.total_inferences_ += batch_stats.total_inferences_;
-    // std::cout << epoch_stats.ToString();
+    std::cout << epoch_stats.ToString();
 
     batch = reader.GetNextBatchSample(params.batch_size);
   }
