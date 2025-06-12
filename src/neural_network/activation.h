@@ -7,7 +7,7 @@ enum class Activation {
   SIGMOID,
 };
 
-std::function<float(float)> GetActivation(Activation activation);
-std::function<float(float)> GetActivationDeriv(Activation activation);
+std::function<double(double)> GetActivation(Activation activation);
+std::function<double(double)> GetActivationDeriv(Activation activation);
 
 #endif

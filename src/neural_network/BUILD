@@ -54,6 +54,7 @@ cc_library(
     ":neural_network",
     "//src/common:assert",
     "//src/common:matrix",
+    "//src/common:thread_pool",
     "//src/io:csv_reader",
   ],
 )

@@ -5,16 +5,16 @@
 
 #include "src/common/assert.h"
 
-float Sigmoid(float x) {
+double Sigmoid(double x) {
   return 1.0f / (1.0f + std::exp(-x));
 }
 
-float SigmoidDeriv(float x) {
-  float y = Sigmoid(x);
+double SigmoidDeriv(double x) {
+  double y = Sigmoid(x);
   return y * (1.0f - y);
 }
 
-std::function<float(float)> GetActivation(Activation activation) {
+std::function<double(double)> GetActivation(Activation activation) {
   using enum Activation;
   switch (activation) {
     case SIGMOID: { return Sigmoid; }
@@ -22,7 +22,7 @@ std::function<float(float)> GetActivation(Activation activation) {
   }
 }
 
-std::function<float(float)> GetActivationDeriv(Activation activation) {
+std::function<double(double)> GetActivationDeriv(Activation activation) {
   using enum Activation;
   switch (activation) {
     case SIGMOID: { return SigmoidDeriv; }

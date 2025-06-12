@@ -19,7 +19,7 @@ TEST(MatrixTest, AddSucceed) {
 }
 
 TEST(MatrixTest, ScalarMultiplySucceed) {
-  float scalar = 2.0f;
+  double scalar = 2.0f;
   auto a = Matrix(2, 3, {
         1, 2, 3,
         4, 5, 6,
@@ -86,7 +86,7 @@ TEST(MatrixTest, MapSucceed) {
         10, 20, 30,
         40, 50, 60,
       });
-  EXPECT_TRUE(x.Map([](float x) { return x * 10; }) == expected);
+  EXPECT_TRUE(x.Map([](double x) { return x * 10; }) == expected);
 }
 
 TEST(MatrixTest, MergeSucceed) {
@@ -102,7 +102,7 @@ TEST(MatrixTest, MergeSucceed) {
         11, 22,
         33, 44,
       });
-  EXPECT_TRUE(x.Merge(y, [](float x, float y) { return x + y; }) == expected);
+  EXPECT_TRUE(x.Merge(y, [](double x, double y) { return x + y; }) == expected);
 }
 
 TEST(MatrixTest, ClassifySucceed) {

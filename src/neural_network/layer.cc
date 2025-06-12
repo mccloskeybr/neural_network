@@ -36,9 +36,9 @@ void Layer::CalcPDCostWeightedInputIntermed(LayerLearnCache* cache, LayerLearnCa
   ASSERT(next_cache->pd_cost_weighted_input.has_value());
   cache->pd_cost_weighted_input = Matrix(1, next_cache->layer->weights_.RowCount());
   for (int32_t i = 0; i < next_cache->layer->weights_.RowCount(); i++) {
-    float pd_cost_weighted_input = 0.0f;
+    double pd_cost_weighted_input = 0.0;
     for (int32_t j = 0; j < next_cache->layer->weights_.ColCount(); j++) {
-      float pd_weighted_input = next_cache->layer->weights_.ElementAt(i, j);
+      double pd_weighted_input = next_cache->layer->weights_.ElementAt(i, j);
       pd_cost_weighted_input +=
         pd_weighted_input *
         next_cache->pd_cost_weighted_input->ElementAt(0, j);
@@ -52,7 +52,7 @@ std::pair<Matrix, Matrix> Layer::FinishBackPropagate(LayerLearnCache* cache) con
   Matrix cost_gradient_weights = Matrix(weights_.RowCount(), weights_.ColCount());
   for (int32_t c = 0; c < cost_gradient_weights.ColCount(); c++) {
     for (int32_t r = 0; r < cost_gradient_weights.RowCount(); r++) {
-      float pd_cost_weight =
+      double pd_cost_weight =
         cache->input.ElementAt(0, r) *
         cache->pd_cost_weighted_input->ElementAt(0, c);
       cost_gradient_weights.MutableElementAt(r, c) = pd_cost_weight;
@@ -61,7 +61,7 @@ std::pair<Matrix, Matrix> Layer::FinishBackPropagate(LayerLearnCache* cache) con
 
   Matrix cost_gradient_biases = Matrix(biases_.RowCount(), biases_.ColCount());
   for (int32_t c = 0; c < cost_gradient_biases.ColCount(); c++) {
-    float pd_cost_bias = 1.0f * cache->pd_cost_weighted_input->ElementAt(0, c);
+    double pd_cost_bias = 1.0 * cache->pd_cost_weighted_input->ElementAt(0, c);
     cost_gradient_biases.MutableElementAt(0, c) = pd_cost_bias;
   }
 
@@ -72,14 +72,14 @@ void Layer::ApplyGradients(std::pair<Matrix, Matrix> gradients) {
   const Matrix cost_gradient_weights = std::move(gradients.first);
   weights_ = weights_.Merge(
       cost_gradient_weights,
-      [&](float weight, float cost_gradient) {
-        return weight + -1.0f * cost_gradient * params_->learn_rate;
+      [&](double weight, double cost_gradient) {
+        return weight + -1.0 * cost_gradient * params_->learn_rate;
       });
 
   const Matrix cost_gradient_biases = std::move(gradients.second);
   biases_ = biases_.Merge(
       cost_gradient_biases,
-      [&](float bias, float cost_gradient) {
-        return bias + -1.0f * cost_gradient * params_->learn_rate;
+      [&](double bias, double cost_gradient) {
+        return bias + -1.0 * cost_gradient * params_->learn_rate;
       });
 }

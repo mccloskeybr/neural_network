@@ -7,7 +7,7 @@ enum class Cost {
   MEAN_SQUARED,
 };
 
-std::function<float(float, float)> GetCost(Cost cost);
-std::function<float(float, float)> GetCostDeriv(Cost cost);
+std::function<double(double, double)> GetCost(Cost cost);
+std::function<double(double, double)> GetCostDeriv(Cost cost);
 
 #endif

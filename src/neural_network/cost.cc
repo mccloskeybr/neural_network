@@ -5,16 +5,16 @@
 
 #include "src/common/assert.h"
 
-float MeanSquaredError(float actual, float expected) {
-  float error = actual - expected;
+double MeanSquaredError(double actual, double expected) {
+  double error = actual - expected;
   return 0.5f * error * error;
 }
 
-float MeanSquaredErrorDeriv(float actual, float expected) {
+double MeanSquaredErrorDeriv(double actual, double expected) {
   return actual - expected;
 }
 
-std::function<float(float, float)> GetCost(Cost cost) {
+std::function<double(double, double)> GetCost(Cost cost) {
   using enum Cost;
   switch (cost) {
     case MEAN_SQUARED: { return MeanSquaredError; }
@@ -22,7 +22,7 @@ std::function<float(float, float)> GetCost(Cost cost) {
   }
 }
 
-std::function<float(float, float)> GetCostDeriv(Cost cost) {
+std::function<double(double, double)> GetCostDeriv(Cost cost) {
   using enum Cost;
   switch (cost) {
     case MEAN_SQUARED: { return MeanSquaredErrorDeriv; }

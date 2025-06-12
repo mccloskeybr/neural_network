@@ -12,9 +12,9 @@
 std::optional<CsvReader> CsvReader::Open(std::string filename) {
   std::ifstream file(filename);
   if (!file.is_open()) { return std::nullopt; }
-  std::string line;
-  getline(file, line); // NOTE: eat headers
-  return CsvReader(std::move(file));
+  auto reader = CsvReader(std::move(file));
+  reader.Reset();
+  return reader;
 }
 
 void CsvReader::Reset() {
@@ -37,7 +37,7 @@ CsvReader::GetNextSample() {
   std::getline(stream, field, ',');
   expected_class = std::stoul(field);
 
-  std::vector<float> input_elements;
+  std::vector<double> input_elements;
   while (std::getline(stream, field, ',')) {
     input_elements.push_back(std::stof(field));
   }

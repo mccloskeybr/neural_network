@@ -26,3 +26,9 @@ cc_test(
     "@googletest//:gtest_main",
   ],
 )
+
+cc_library(
+  name = "thread_pool",
+  hdrs = ["thread_pool.h"],
+  deps = [],
+)

@@ -11,6 +11,7 @@
 
 #include "src/params.h"
 #include "src/common/matrix.h"
+#include "src/common/thread_pool.h"
 #include "src/io/csv_reader.h"
 #include "src/neural_network/neural_network.h"
 
@@ -26,7 +27,7 @@ struct Stats {
       name_ << ":" << std::endl <<
       "total_correct_inferences: " << total_correct_inferences_ << std::endl <<
       "total_inferences: " << total_inferences_ << std::endl <<
-      "accuracy: " << (((float) total_correct_inferences_) / total_inferences_) << std::endl <<
+      "accuracy: " << (((double) total_correct_inferences_) / total_inferences_) << std::endl <<
       std::endl;
     return stream.str();
   }
@@ -42,61 +43,58 @@ struct WorkerOutput {
   std::vector<std::vector<std::pair<Matrix, Matrix>>> gradients;
 };
 
-void TrainPartition(
-    const NeuralNetwork& neural_network,
-    std::vector<std::pair<uint32_t, Matrix>> samples,
-    std::promise<WorkerOutput> result) {
+WorkerOutput TrainPartition(
+    const NeuralNetwork* neural_network,
+    std::vector<std::pair<uint32_t, Matrix>> samples) {
   WorkerOutput worker_output;
-  worker_output.gradients.reserve(neural_network.LayersCount());
+  worker_output.gradients.reserve(neural_network->LayersCount());
   for (int32_t i = 0; i < samples.size(); i++) {
     uint32_t expected_class = samples[i].first;
     Matrix input = std::move(samples[i].second);
 
     // TODO: apply this directly to file data, this is specific to the MNIST data set.
-    input = input.Map([](float x) { return x / 255.0f; } );
+    input = input.Map([](double x) { return x / 255.0f; } );
     Matrix expected_output = Matrix(1, 10);
     expected_output.MutableElementAt(0, expected_class) = 1.0f;
 
     NeuralNetwork::NetworkLearnCache cache = {};
-    Matrix model_output = neural_network.FeedForward(std::move(input), &cache);
+    Matrix model_output = neural_network->FeedForward(std::move(input), &cache);
     worker_output.stats.total_correct_inferences_ =
       (model_output.Classify() == expected_output.Classify());
     worker_output.stats.total_inferences_++;
-    worker_output.gradients.emplace_back(neural_network.BackPropagate(
+    worker_output.gradients.emplace_back(neural_network->BackPropagate(
         std::move(model_output), std::move(expected_output), &cache));
   }
-  result.set_value(worker_output);
+  return worker_output;
 }
 
 void TrainEpoch(
-    Parameters params, NeuralNetwork& neural_network, CsvReader& reader) {
+    Parameters params, NeuralNetwork& neural_network, CsvReader& reader,
+    ThreadPool& thread_pool) {
   auto epoch_stats = Stats("EPOCH");
 
-  int32_t ideal_partition_size = std::ceil(((float) params.batch_size) / params.num_threads);
+  int32_t ideal_partition_size = std::ceil(((double) params.batch_size) / params.num_threads);
   ASSERT(ideal_partition_size > 0);
-  std::vector<std::pair<uint32_t, Matrix>> partition;
-  partition.reserve(ideal_partition_size);
 
   std::vector<std::pair<uint32_t, Matrix>> batch = reader.GetNextBatchSample(params.batch_size);
   while (batch.size() > 0) { // NOTE: while there is still file data
     auto batch_stats = Stats("BATCH");
 
-    std::vector<std::thread> worker_threads;
-    worker_threads.reserve(params.batch_size);
-    std::vector<std::future<WorkerOutput>> worker_outputs;
-    worker_outputs.reserve(params.batch_size);
-
-    while (batch.size() > 0) { // NOTE: while processing a given batch
-      partition.clear();
-      int32_t partition_size = std::min(ideal_partition_size, (int32_t) batch.size());
-      for (int32_t i = 0; i < partition_size; i++) {
-        partition.emplace_back(batch.back());
+    // NOTE: enqueue batch work
+    std::vector<std::future<WorkerOutput>> worker_output_futures;
+    worker_output_futures.reserve(params.num_threads);
+    while (batch.size() > 0) {
+      std::vector<std::pair<uint32_t, Matrix>> sample_partition;
+      int32_t sample_partition_size = std::min(ideal_partition_size, (int32_t) batch.size());
+      sample_partition.reserve(std::min(sample_partition_size, (int32_t) batch.size()));
+      for (int32_t i = 0; i < sample_partition_size; i++) {
+        sample_partition.push_back(std::move(batch.back()));
         batch.pop_back();
       }
-      std::promise<WorkerOutput> worker_promise;
-      worker_outputs.push_back(worker_promise.get_future());
-      worker_threads.push_back(std::thread(
-            TrainPartition, neural_network, partition, std::move(worker_promise)));
+
+      std::future<WorkerOutput> future = thread_pool.Push(
+          TrainPartition, &neural_network, std::move(sample_partition));
+      worker_output_futures.push_back(std::move(future));
     }
 
     std::vector<std::pair<Matrix, Matrix>> gradients_accum;
@@ -107,10 +105,9 @@ void TrainEpoch(
             Matrix(layer.InputSize(), layer.OutputSize()),
             Matrix(1, layer.OutputSize())));
     }
-
-    for (std::thread& worker_thread : worker_threads) { worker_thread.join(); }
-    for (int32_t i = 0; i < worker_outputs.size(); i++) {
-      WorkerOutput worker_output = worker_outputs[i].get();
+    for (std::future<WorkerOutput>& worker_output_future : worker_output_futures) {
+      worker_output_future.wait();
+      WorkerOutput worker_output = worker_output_future.get();
       batch_stats.total_correct_inferences_ += worker_output.stats.total_correct_inferences_;
       batch_stats.total_inferences_ += worker_output.stats.total_inferences_;
       for (std::vector<std::pair<Matrix, Matrix>>& gradients : worker_output.gradients) {
@@ -134,9 +131,10 @@ void TrainEpoch(
 }
 
 NeuralNetwork Train(Parameters params, CsvReader reader) {
+  auto thread_pool = ThreadPool(params.num_threads);
   auto neural_network = NeuralNetwork::Random(params);
   for (int32_t i = 0; i < params.num_epochs; i++) {
-    TrainEpoch(params, neural_network, reader);
+    TrainEpoch(params, neural_network, reader, thread_pool);
     reader.Reset();
   }
   return neural_network;

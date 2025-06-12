@@ -3,6 +3,7 @@
 #include <ostream>
 #include <sstream>
 #include <string>
+#include <thread>
 #include <vector>
 #include <utility>
 
@@ -23,10 +24,10 @@ int main(int argc, char* argv[]) {
     .layer_sizes = {784, 128, 64, 10},
     .activation = Activation::SIGMOID,
     .cost = Cost::MEAN_SQUARED,
-    .learn_rate = 0.05,
-    .num_threads = 5,
-    .batch_size = 5,
-    .num_epochs = 3,
+    .learn_rate = 0.005,
+    .num_threads = std::thread::hardware_concurrency(),
+    .batch_size = 3,
+    .num_epochs = 1,
   };
   NeuralNetwork neural_network = Train(std::move(params), std::move(*reader));
 

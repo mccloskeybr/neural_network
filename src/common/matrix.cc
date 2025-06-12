@@ -14,7 +14,7 @@ Matrix Matrix::Random(int32_t row_count, int32_t col_count) {
   std::random_device rd{};
   std::mt19937 gen{rd()};
   std::normal_distribution rand;
-  std::vector<float> result_elements(row_count * col_count);
+  std::vector<double> result_elements(row_count * col_count);
   for (int32_t i = 0; i < result_elements.size(); i++) {
     result_elements[i] = rand(gen);
   }
@@ -22,7 +22,7 @@ Matrix Matrix::Random(int32_t row_count, int32_t col_count) {
 }
 
 Matrix Matrix::Transpose() const {
-  std::vector<float> result_elements;
+  std::vector<double> result_elements;
   result_elements.reserve(elements_.size());
   for (int32_t c = 0; c < col_count_; c++) {
     for (int32_t r = 0; r < row_count_; r++) {
@@ -32,16 +32,16 @@ Matrix Matrix::Transpose() const {
   return Matrix(col_count_, row_count_, std::move(result_elements));
 }
 
-Matrix Matrix::Map(std::function<float(float)> closure) const {
-  std::vector<float> elements_copy = elements_;
-  for (float& x : elements_copy) { x = closure(x); }
+Matrix Matrix::Map(std::function<double(double)> closure) const {
+  std::vector<double> elements_copy = elements_;
+  for (double& x : elements_copy) { x = closure(x); }
   return Matrix(row_count_, col_count_, elements_copy);
 }
 
-Matrix Matrix::Merge(const Matrix& other, std::function<float(float, float)> closure) const {
+Matrix Matrix::Merge(const Matrix& other, std::function<double(double, double)> closure) const {
   ASSERT(row_count_ == other.row_count_);
   ASSERT(col_count_ == other.col_count_);
-  std::vector<float> result_elements;
+  std::vector<double> result_elements;
   result_elements.reserve(elements_.size());
   for (int32_t i = 0; i < elements_.size(); i++) {
     result_elements.push_back(closure(elements_[i], other.elements_[i]));
@@ -52,7 +52,7 @@ Matrix Matrix::Merge(const Matrix& other, std::function<float(float, float)> clo
 Matrix Matrix::HadamardMult(const Matrix& other) const {
   ASSERT(row_count_ == other.row_count_);
   ASSERT(col_count_ == other.col_count_);
-  std::vector<float> result_elements;
+  std::vector<double> result_elements;
   result_elements.reserve(elements_.size());
   for (int32_t i = 0; i < elements_.size(); i++) {
     result_elements.push_back(elements_[i] * other.elements_[i]);
@@ -60,16 +60,16 @@ Matrix Matrix::HadamardMult(const Matrix& other) const {
   return Matrix(row_count_, col_count_, result_elements);
 }
 
-Matrix Matrix::operator*(float scalar) const {
+Matrix Matrix::operator*(double scalar) const {
   Matrix result = *this;
-  for (float& element : result.elements_) { element *= scalar; }
+  for (double& element : result.elements_) { element *= scalar; }
   return result;
 }
 
 Matrix Matrix::operator+(const Matrix& other) const {
   ASSERT(row_count_ == other.row_count_);
   ASSERT(col_count_ == other.col_count_);
-  std::vector<float> result_elements(row_count_ * col_count_);
+  std::vector<double> result_elements(row_count_ * col_count_);
   for (int32_t i = 0; i < result_elements.size(); i++) {
     result_elements[i] = elements_[i] + other.elements_[i];
   }
@@ -115,12 +115,12 @@ int32_t Matrix::RowCount() const { return row_count_; }
 
 int32_t Matrix::ColCount() const { return col_count_; }
 
-float Matrix::ElementAt(int32_t r, int32_t c) const {
+double Matrix::ElementAt(int32_t r, int32_t c) const {
   ASSERT(r < row_count_ && c < col_count_);
   return elements_[(r * col_count_) + c];
 }
 
-float& Matrix::MutableElementAt(int32_t r, int32_t c) {
+double& Matrix::MutableElementAt(int32_t r, int32_t c) {
   ASSERT(r < row_count_ && c < col_count_);
   return elements_[(r * col_count_) + c];
 }
