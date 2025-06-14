@@ -6,7 +6,7 @@
 #include <random>
 #include <utility>
 
-#include "src/common/assert.h"
+#include "absl/log/check.h"
 
 class Matrix {
  public:
@@ -19,8 +19,8 @@ class Matrix {
     row_count_(row_count),
     col_count_(col_count),
     elements_(std::move(elements)) {
-      ASSERT(elements_.size() > 0);
-      ASSERT(elements_.size() == row_count_ * col_count_);
+      DCHECK(elements_.size() > 0);
+      DCHECK(elements_.size() == row_count_ * col_count_);
     };
   static Matrix Random(int32_t row_count, int32_t col_count);
 

@@ -5,9 +5,9 @@
 
 #include "src/protos/model_checkpoint.pb.h"
 
-protos::ModelCheckpoint ReadModelCheckpoint(std::string file_path);
-void WriteModelCheckpoint(protos::ModelCheckpoint checkpoint_proto);
-void WriteModelCheckpoint(
+absl::StatusOr<protos::ModelCheckpoint> ReadModelCheckpoint(
+    std::string file_path);
+absl::Status WriteModelCheckpoint(
     std::string file_path, const protos::ModelCheckpoint& checkpoint_proto);
 
 #endif

@@ -5,7 +5,7 @@
 #include <optional>
 #include <utility>
 
-#include "src/common/assert.h"
+#include "absl/log/check.h"
 #include "src/common/matrix.h"
 #include "src/neural_network/activation.h"
 #include "src/neural_network/cost.h"
@@ -26,8 +26,8 @@ class Layer {
     learn_rate_(learn_rate),
     momentum_(momentum),
     regularization_(regularization) {
-      ASSERT(weights_.ColCount() == biases_.ColCount());
-      ASSERT(biases_.RowCount() == 1);
+      DCHECK(weights_.ColCount() == biases_.ColCount());
+      DCHECK(biases_.RowCount() == 1);
     }
 
   struct LayerLearnCache {

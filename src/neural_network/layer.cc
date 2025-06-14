@@ -2,7 +2,7 @@
 
 #include <optional>
 
-#include "src/common/assert.h"
+#include "absl/log/check.h"
 #include "src/neural_network/activation.h"
 #include "src/neural_network/cost.h"
 
@@ -37,7 +37,7 @@ void Layer::CalcPDCostWeightedInputOutput(LayerLearnCache* cache, const Matrix& 
 }
 
 void Layer::CalcPDCostWeightedInputIntermed(LayerLearnCache* cache, LayerLearnCache* next_cache) const {
-  ASSERT(next_cache->pd_cost_weighted_input.has_value());
+  DCHECK(next_cache->pd_cost_weighted_input.has_value());
   // SPEEDUP: Matrix.MultTranspose
   cache->pd_cost_weighted_input =
     *next_cache->pd_cost_weighted_input * next_cache->layer->weights_.Transpose();
@@ -45,7 +45,7 @@ void Layer::CalcPDCostWeightedInputIntermed(LayerLearnCache* cache, LayerLearnCa
 }
 
 std::pair<Matrix, Matrix> Layer::FinishBackPropagate(LayerLearnCache* cache) const {
-  ASSERT(cache->pd_cost_weighted_input.has_value());
+  DCHECK(cache->pd_cost_weighted_input.has_value());
   // SPEEDUP: Matrix.TransposeMult
   Matrix cost_gradient_weights =
     cache->input.Transpose() * *cache->pd_cost_weighted_input;

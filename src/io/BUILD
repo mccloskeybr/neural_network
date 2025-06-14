@@ -7,6 +7,9 @@ cc_library(
   hdrs = ["csv_reader.h"],
   srcs = ["csv_reader.cc"],
   deps = [
+    "@abseil-cpp//absl/status:status",
+    "@abseil-cpp//absl/status:statusor",
+    "@abseil-cpp//absl/strings:strings",
     "//src/common:matrix",
   ],
 )
@@ -16,7 +19,9 @@ cc_library(
   hdrs = ["model_checkpoint.h"],
   srcs = ["model_checkpoint.cc"],
   deps = [
-    "//src/common:assert",
+    "@abseil-cpp//absl/status:status",
+    "@abseil-cpp//absl/status:statusor",
+    "@abseil-cpp//absl/strings:strings",
     "//src/protos:model_checkpoint_cc_proto",
   ],
 )

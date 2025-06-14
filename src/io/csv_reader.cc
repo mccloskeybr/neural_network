@@ -7,11 +7,17 @@
 #include <sstream>
 #include <vector>
 
+#include "absl/status/status.h"
+#include "absl/status/statusor.h"
+#include "absl/strings/str_cat.h"
 #include "src/common/matrix.h"
 
-std::optional<CsvReader> CsvReader::Open(std::string filename) {
+absl::StatusOr<CsvReader> CsvReader::Open(std::string filename) {
   std::ifstream file(filename);
-  if (!file.is_open()) { return std::nullopt; }
+  if (!file.is_open()) {
+    return absl::InvalidArgumentError(
+        absl::StrCat("Error opening file with path:", filename));
+  }
   auto reader = CsvReader(std::move(file));
   reader.Reset();
   return reader;

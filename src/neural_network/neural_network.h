@@ -10,10 +10,8 @@
 
 class NeuralNetwork {
  public:
-  explicit NeuralNetwork(
-      Parameters params, std::vector<Matrix> weights, std::vector<Matrix> biases);
   static NeuralNetwork Random(Parameters params);
-  static NeuralNetwork FromCheckpoint(
+  static absl::StatusOr<NeuralNetwork> FromCheckpoint(
       const protos::ModelCheckpoint& checkpoint_proto, Parameters params);
 
   struct NetworkLearnCache {
@@ -32,6 +30,10 @@ class NeuralNetwork {
   const Layer& GetLayer(int32_t i) const;
 
   protos::ModelCheckpoint ToCheckpoint() const;
+
+ protected:
+  explicit NeuralNetwork(
+      Parameters params, std::vector<Matrix> weights, std::vector<Matrix> biases);
 
  private:
   Parameters params_;

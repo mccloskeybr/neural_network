@@ -3,11 +3,11 @@
 #include <cmath>
 #include <functional>
 
-#include "src/common/assert.h"
+#include "absl/log/check.h"
 #include "src/common/matrix.h"
 
 Matrix Sigmoid(const Matrix& m) {
-  ASSERT(m.RowCount() == 1);
+  DCHECK(m.RowCount() == 1);
   Matrix result = m;
   for (int32_t c = 0; c < result.ColCount(); c++) {
     double& e = result.MutableElementAt(0, c);
@@ -17,7 +17,7 @@ Matrix Sigmoid(const Matrix& m) {
 }
 
 Matrix SigmoidDeriv(const Matrix& m) {
-  ASSERT(m.RowCount() == 1);
+  DCHECK(m.RowCount() == 1);
   Matrix result = m;
   for (int32_t c = 0; c < result.ColCount(); c++) {
     double& e = result.MutableElementAt(0, c);
@@ -29,7 +29,7 @@ Matrix SigmoidDeriv(const Matrix& m) {
 
 // TODO: usually don't see upper bounds clamping, could investigate
 Matrix ReLU(const Matrix& m) {
-  ASSERT(m.RowCount() == 1);
+  DCHECK(m.RowCount() == 1);
   Matrix result = m;
   for (int32_t c = 0; c < result.ColCount(); c++) {
     double& e = result.MutableElementAt(0, c);
@@ -41,7 +41,7 @@ Matrix ReLU(const Matrix& m) {
 }
 
 Matrix ReLUDeriv(const Matrix& m) {
-  ASSERT(m.RowCount() == 1);
+  DCHECK(m.RowCount() == 1);
   Matrix result = m;
   for (int32_t c = 0; c < result.ColCount(); c++) {
     double& e = result.MutableElementAt(0, c);
@@ -53,7 +53,7 @@ Matrix ReLUDeriv(const Matrix& m) {
 }
 
 Matrix TanH(const Matrix& m) {
-  ASSERT(m.RowCount() == 1);
+  DCHECK(m.RowCount() == 1);
   Matrix result = m;
   for (int32_t c = 0; c < result.ColCount(); c++) {
     double& e = result.MutableElementAt(0, c);
@@ -64,7 +64,7 @@ Matrix TanH(const Matrix& m) {
 }
 
 Matrix TanHDeriv(const Matrix& m) {
-  ASSERT(m.RowCount() == 1);
+  DCHECK(m.RowCount() == 1);
   Matrix result = m;
   for (int32_t c = 0; c < result.ColCount(); c++) {
     double& e = result.MutableElementAt(0, c);
@@ -76,7 +76,7 @@ Matrix TanHDeriv(const Matrix& m) {
 }
 
 Matrix Softmax(const Matrix& m) {
-  ASSERT(m.RowCount() == 1);
+  DCHECK(m.RowCount() == 1);
   Matrix result = m;
   double exp_sum = 0.0;
   for (int32_t c = 0; c < result.ColCount(); c++) {
@@ -91,7 +91,7 @@ Matrix Softmax(const Matrix& m) {
 }
 
 Matrix SoftmaxDeriv(const Matrix& m) {
-  ASSERT(m.RowCount() == 1);
+  DCHECK(m.RowCount() == 1);
   Matrix result = m;
   double exp_sum = 0.0;
   for (int32_t c = 0; c < result.ColCount(); c++) {
@@ -113,7 +113,7 @@ std::function<Matrix(const Matrix&)> GetActivation(Activation activation) {
     case RELU: { return ReLU; }
     case TANH: { return TanH; }
     case SOFTMAX: { return Softmax; }
-    default: { UNREACHABLE(); return Sigmoid; }
+    default: { CHECK(false); return Sigmoid; }
   }
 }
 
@@ -124,6 +124,6 @@ std::function<Matrix(const Matrix&)> GetActivationDeriv(Activation activation) {
     case RELU: { return ReLUDeriv; }
     case TANH: { return TanHDeriv; }
     case SOFTMAX: { return SoftmaxDeriv; }
-    default: { UNREACHABLE(); return SigmoidDeriv; }
+    default: { CHECK(false); return SigmoidDeriv; }
   }
 }

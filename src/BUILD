@@ -15,6 +15,10 @@ cc_binary(
   name = "main",
   srcs = ["main.cc"],
   deps = [
+    "@abseil-cpp//absl/flags:flag",
+    "@abseil-cpp//absl/flags:parse",
+    "@abseil-cpp//absl/log:check",
+    "@abseil-cpp//absl/status:statusor",
     "//src/common:assert",
     "//src/common:matrix",
     "//src/io:csv_reader",

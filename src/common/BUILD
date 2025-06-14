@@ -13,7 +13,7 @@ cc_library(
   hdrs = ["matrix.h"],
   srcs = ["matrix.cc"],
   deps = [
-    "//src/common:assert",
+    "@abseil-cpp//absl/log:check",
   ],
 )
 

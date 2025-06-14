@@ -8,7 +8,7 @@
 #include <string>
 #include <utility>
 
-#include "src/common/assert.h"
+#include "absl/log/check.h"
 
 Matrix Matrix::Random(int32_t row_count, int32_t col_count) {
   std::random_device rd{};
@@ -32,8 +32,8 @@ Matrix Matrix::Transpose() const {
 }
 
 Matrix Matrix::HadamardMult(const Matrix& other) const {
-  ASSERT(row_count_ == other.row_count_);
-  ASSERT(col_count_ == other.col_count_);
+  DCHECK(row_count_ == other.row_count_);
+  DCHECK(col_count_ == other.col_count_);
   std::vector<double> result_elements;
   result_elements.reserve(elements_.size());
   for (int32_t i = 0; i < elements_.size(); i++) {
@@ -43,8 +43,8 @@ Matrix Matrix::HadamardMult(const Matrix& other) const {
 }
 
 void Matrix::HadamardMultInPlace(const Matrix& other) {
-  ASSERT(row_count_ == other.row_count_);
-  ASSERT(col_count_ == other.col_count_);
+  DCHECK(row_count_ == other.row_count_);
+  DCHECK(col_count_ == other.col_count_);
   for (int32_t i = 0; i < elements_.size(); i++) {
     elements_[i] *= other.elements_[i];
   }
@@ -57,8 +57,8 @@ Matrix Matrix::operator*(double scalar) const {
 }
 
 Matrix Matrix::operator+(const Matrix& other) const {
-  ASSERT(row_count_ == other.row_count_);
-  ASSERT(col_count_ == other.col_count_);
+  DCHECK(row_count_ == other.row_count_);
+  DCHECK(col_count_ == other.col_count_);
   std::vector<double> result_elements(row_count_ * col_count_);
   for (int32_t i = 0; i < result_elements.size(); i++) {
     result_elements[i] = elements_[i] + other.elements_[i];
@@ -67,16 +67,16 @@ Matrix Matrix::operator+(const Matrix& other) const {
 }
 
 void Matrix::operator+=(const Matrix& other) {
-  ASSERT(row_count_ == other.row_count_);
-  ASSERT(col_count_ == other.col_count_);
+  DCHECK(row_count_ == other.row_count_);
+  DCHECK(col_count_ == other.col_count_);
   for (int32_t i = 0; i < elements_.size(); i++) {
     elements_[i] += other.elements_[i];
   }
 }
 
 Matrix Matrix::operator-(const Matrix& other) const {
-  ASSERT(row_count_ == other.row_count_);
-  ASSERT(col_count_ == other.col_count_);
+  DCHECK(row_count_ == other.row_count_);
+  DCHECK(col_count_ == other.col_count_);
   std::vector<double> result_elements(row_count_ * col_count_);
   for (int32_t i = 0; i < result_elements.size(); i++) {
     result_elements[i] = elements_[i] - other.elements_[i];
@@ -85,15 +85,15 @@ Matrix Matrix::operator-(const Matrix& other) const {
 }
 
 void Matrix::operator-=(const Matrix& other) {
-  ASSERT(row_count_ == other.row_count_);
-  ASSERT(col_count_ == other.col_count_);
+  DCHECK(row_count_ == other.row_count_);
+  DCHECK(col_count_ == other.col_count_);
   for (int32_t i = 0; i < elements_.size(); i++) {
     elements_[i] -= other.elements_[i];
   }
 }
 
 Matrix Matrix::operator*(const Matrix& other) const {
-  ASSERT(col_count_ == other.row_count_);
+  DCHECK(col_count_ == other.row_count_);
   Matrix result(row_count_, other.col_count_);
   for (int32_t i = 0; i < row_count_; i++) {
     for (int32_t k = 0; k < col_count_; k++) {
@@ -106,8 +106,8 @@ Matrix Matrix::operator*(const Matrix& other) const {
 }
 
 bool Matrix::operator==(const Matrix& other) const {
-  ASSERT(row_count_ == other.row_count_);
-  ASSERT(col_count_ == other.col_count_);
+  DCHECK(row_count_ == other.row_count_);
+  DCHECK(col_count_ == other.col_count_);
   for (int32_t i = 0; i < elements_.size(); i++) {
     if (elements_[i] != other.elements_[i]) {
       return false;
@@ -117,7 +117,7 @@ bool Matrix::operator==(const Matrix& other) const {
 }
 
 int32_t Matrix::Classify() const {
-  ASSERT(row_count_ == 1);
+  DCHECK(row_count_ == 1);
   int32_t idx_max = 0;
   for (int32_t i = 1; i < elements_.size(); i++) {
     if (elements_[i] > elements_[idx_max]) {
@@ -132,12 +132,12 @@ int32_t Matrix::RowCount() const { return row_count_; }
 int32_t Matrix::ColCount() const { return col_count_; }
 
 double Matrix::ElementAt(int32_t r, int32_t c) const {
-  ASSERT(r < row_count_ && c < col_count_);
+  DCHECK(r < row_count_ && c < col_count_);
   return elements_[(r * col_count_) + c];
 }
 
 double& Matrix::MutableElementAt(int32_t r, int32_t c) {
-  ASSERT(r < row_count_ && c < col_count_);
+  DCHECK(r < row_count_ && c < col_count_);
   return elements_[(r * col_count_) + c];
 }
 

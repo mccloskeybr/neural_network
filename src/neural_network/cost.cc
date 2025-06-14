@@ -3,7 +3,7 @@
 #include <cmath>
 #include <functional>
 
-#include "src/common/assert.h"
+#include "absl/log/check.h"
 #include "src/common/matrix.h"
 
 Matrix MeanSquaredError(const Matrix& actual, const Matrix& expected) {
@@ -18,7 +18,7 @@ std::function<Matrix(const Matrix&, const Matrix&)> GetCost(Cost cost) {
   using enum Cost;
   switch (cost) {
     case MEAN_SQUARED: { return MeanSquaredError; }
-    default: { UNREACHABLE(); return MeanSquaredError; }
+    default: { CHECK(false); return MeanSquaredError; }
   }
 }
 
@@ -26,7 +26,7 @@ std::function<Matrix(const Matrix&, const Matrix&)> GetCostDeriv(Cost cost) {
   using enum Cost;
   switch (cost) {
     case MEAN_SQUARED: { return MeanSquaredErrorDeriv; }
-    default: { UNREACHABLE(); return MeanSquaredErrorDeriv; }
+    default: { CHECK(false); return MeanSquaredErrorDeriv; }
   }
 }
 

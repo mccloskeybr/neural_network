@@ -4,14 +4,16 @@
 #include <ostream>
 #include <vector>
 
-#include "src/common/assert.h"
+#include "absl/log/check.h"
+#include "absl/status/status.h"
+#include "absl/status/statusor.h"
 #include "src/common/matrix.h"
 
 NeuralNetwork::NeuralNetwork(
     Parameters params,
     std::vector<Matrix> weights,
     std::vector<Matrix> biases) {
-  ASSERT(weights.size() == biases.size());
+  DCHECK(weights.size() == biases.size());
   params_ = std::move(params);
   layers_.reserve(weights.size());
   for (int32_t i = 0; i < weights.size(); i++) {
@@ -38,21 +40,28 @@ NeuralNetwork NeuralNetwork::Random(Parameters params) {
   return NeuralNetwork(std::move(params), std::move(weights), std::move(biases));
 }
 
-NeuralNetwork NeuralNetwork::FromCheckpoint(
+absl::StatusOr<NeuralNetwork> NeuralNetwork::FromCheckpoint(
     const protos::ModelCheckpoint& checkpoint_proto, Parameters params) {
-  ASSERT(params.layer_sizes.size() == checkpoint_proto.layers().size());
-
   std::vector<Matrix> weights;
   std::vector<Matrix> biases;
-  weights.reserve(params.layer_sizes.size() - 1);
-  biases.reserve(params.layer_sizes.size() - 1);
+  weights.reserve(checkpoint_proto.layers().size() - 1);
+  biases.reserve(checkpoint_proto.layers().size() - 1);
 
   for (int32_t i = 0; i < checkpoint_proto.layers().size(); i++) {
     const protos::ModelCheckpoint::Layer* curr_layer = &checkpoint_proto.layers()[i];
     const protos::ModelCheckpoint::Layer* next_layer = nullptr;
-    if (i < checkpoint_proto.layers().size() - 1) { next_layer = &checkpoint_proto.layers()[i + 1]; }
-    if (next_layer != nullptr) { ASSERT(curr_layer->col_count() == next_layer->row_count()); }
-
+    if (i < checkpoint_proto.layers().size() - 1) {
+      next_layer = &checkpoint_proto.layers()[i + 1];
+    }
+    if (next_layer != nullptr) {
+      if (curr_layer->col_count() != next_layer->row_count()) {
+        return absl::InvalidArgumentError(absl::StrCat(
+              "Invalid weight dimensions! Layer: ", i,
+              " has column count: ", curr_layer->col_count(),
+              ", while layer: ", i + 1,
+              " has row count: ", next_layer->row_count()));
+      }
+    }
     weights.emplace_back(Matrix(
         curr_layer->row_count(), curr_layer->col_count(),
         {curr_layer->weights().begin(), curr_layer->weights().end()}));
@@ -97,7 +106,7 @@ Matrix NeuralNetwork::FeedForward(const Matrix& input, NetworkLearnCache* cache)
 
 std::vector<std::pair<Matrix, Matrix>> NeuralNetwork::BackPropagate(
     const Matrix& actual_output, const Matrix& expected_output, NetworkLearnCache* cache) const {
-  ASSERT(cache != nullptr);
+  DCHECK(cache != nullptr);
   std::vector<std::pair<Matrix, Matrix>> gradients(layers_.size());
 
   int32_t output_idx = layers_.size() - 1;
@@ -115,7 +124,7 @@ std::vector<std::pair<Matrix, Matrix>> NeuralNetwork::BackPropagate(
 }
 
 void NeuralNetwork::ApplyGradients(const std::vector<std::pair<Matrix, Matrix>>& gradients) {
-  ASSERT(gradients.size() == layers_.size());
+  DCHECK(gradients.size() == layers_.size());
   for (int32_t i = 0; i < gradients.size(); i++) {
     layers_[i].ApplyGradients(gradients[i]);
   }

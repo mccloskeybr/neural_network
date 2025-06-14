@@ -8,6 +8,6 @@
 #include "src/io/csv_reader.h"
 #include "src/neural_network/neural_network.h"
 
-NeuralNetwork Train(Parameters params, CsvReader reader);
+void Train(NeuralNetwork& neural_network, Parameters params, CsvReader reader);
 
 #endif

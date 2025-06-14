@@ -19,6 +19,17 @@ class ThreadPool {
     }
   }
 
+  ~ThreadPool() {
+    {
+      std::scoped_lock lock(work_queue_mutex_);
+      terminate_ = true;
+    }
+    cv_.notify_all();
+    for (std::thread& thread : threads_) {
+      thread.join();
+    }
+  }
+
   template <typename F, typename... Args>
   std::future<std::invoke_result_t<F, Args...>>
   Push(F&& fn, Args&&... args) {
@@ -51,7 +62,8 @@ class ThreadPool {
       std::function<void(void)> work;
       {
         std::unique_lock<std::mutex> lock(work_queue_mutex_);
-        cv_.wait(lock, [&]() { return !work_queue_.empty(); });
+        cv_.wait(lock, [&]() { return terminate_ || !work_queue_.empty(); });
+        if (terminate_ && work_queue_.empty()) { break; }
         work = work_queue_.front();
         work_queue_.pop();
       }
@@ -63,6 +75,7 @@ class ThreadPool {
   std::queue<std::function<void(void)>> work_queue_;
   std::mutex work_queue_mutex_;
   std::condition_variable cv_;
+  bool terminate_;
 };
 
 #endif

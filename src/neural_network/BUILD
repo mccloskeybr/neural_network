@@ -8,7 +8,7 @@ cc_library(
   hdrs = ["cost.h"],
   srcs = ["cost.cc"],
   deps = [
-    "//src/common:assert",
+    "@abseil-cpp//absl/log:check",
     "//src/common:matrix",
   ],
 )
@@ -18,7 +18,7 @@ cc_library(
   hdrs = ["activation.h"],
   srcs = ["activation.cc"],
   deps = [
-    "//src/common:assert",
+    "@abseil-cpp//absl/log:check",
     "//src/common:matrix",
   ],
 )
@@ -30,7 +30,7 @@ cc_library(
   deps = [
     ":activation",
     ":cost",
-    "//src/common:assert",
+    "@abseil-cpp//absl/log:check",
     "//src/common:matrix",
   ],
 )
@@ -41,8 +41,10 @@ cc_library(
   srcs = ["neural_network.cc"],
   deps = [
     ":layer",
+    "@abseil-cpp//absl/log:check",
+    "@abseil-cpp//absl/status:status",
+    "@abseil-cpp//absl/status:statusor",
     "//src:params",
-    "//src/common:assert",
     "//src/common:matrix",
     "//src/protos:model_checkpoint_cc_proto",
   ],
@@ -54,7 +56,7 @@ cc_library(
   srcs = ["trainer.cc"],
   deps = [
     ":neural_network",
-    "//src/common:assert",
+    "@abseil-cpp//absl/log:check",
     "//src/common:matrix",
     "//src/common:thread_pool",
     "//src/io:csv_reader",

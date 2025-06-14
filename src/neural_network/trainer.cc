@@ -9,6 +9,9 @@
 #include <utility>
 #include <vector>
 
+#include <ostream>
+
+#include "absl/log/check.h"
 #include "src/params.h"
 #include "src/common/matrix.h"
 #include "src/common/thread_pool.h"
@@ -79,7 +82,7 @@ void TrainEpoch(
   auto epoch_stats = Stats("EPOCH");
 
   int32_t ideal_partition_size = std::ceil(((double) params.batch_size) / params.num_threads);
-  ASSERT(ideal_partition_size > 0);
+  DCHECK(ideal_partition_size > 0);
 
   std::vector<std::pair<uint32_t, Matrix>> batch = reader.GetNextBatchSample(params.batch_size);
   while (batch.size() > 0) { // NOTE: while there is still file data
@@ -127,7 +130,7 @@ void TrainEpoch(
 
     epoch_stats.total_correct_inferences_ += batch_stats.total_correct_inferences_;
     epoch_stats.total_inferences_ += batch_stats.total_inferences_;
-    std::cout << epoch_stats.ToString();
+    // std::cout << epoch_stats.ToString();
 
     batch = reader.GetNextBatchSample(params.batch_size);
   }
@@ -135,12 +138,10 @@ void TrainEpoch(
   std::cout << epoch_stats.ToString();
 }
 
-NeuralNetwork Train(Parameters params, CsvReader reader) {
+void Train(NeuralNetwork& neural_network, Parameters params, CsvReader reader) {
   auto thread_pool = ThreadPool(params.num_threads);
-  auto neural_network = NeuralNetwork::Random(params);
   for (int32_t i = 0; i < params.num_epochs; i++) {
     TrainEpoch(params, neural_network, reader, thread_pool);
     reader.Reset();
   }
-  return neural_network;
 }
