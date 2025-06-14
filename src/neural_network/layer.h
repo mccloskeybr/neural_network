@@ -9,26 +9,29 @@
 #include "src/common/matrix.h"
 #include "src/neural_network/activation.h"
 #include "src/neural_network/cost.h"
+#include "src/neural_network/params.h"
+#include "src/protos/model_checkpoint.pb.h"
 
 class Layer {
  public:
   explicit Layer(
       Matrix weights, Matrix biases,
-      Activation activation, Cost cost,
-      double learn_rate, double momentum,
-      double regularization) :
+      protos::Activation activation) :
     weights_(std::move(weights)),
     biases_(std::move(biases)),
     weight_velocities_(Matrix(weights_.RowCount(), weights_.ColCount())),
     bias_velocities_(Matrix(biases_.RowCount(), biases_.ColCount())),
-    activation_(activation),
-    cost_(cost),
-    learn_rate_(learn_rate),
-    momentum_(momentum),
-    regularization_(regularization) {
+    activation_(activation) {
       DCHECK(weights_.ColCount() == biases_.ColCount());
       DCHECK(biases_.RowCount() == 1);
     }
+
+  int32_t InputSize() const;
+  int32_t OutputSize() const;
+  const Matrix& Weights() const;
+  const Matrix& Biases() const;
+
+  Matrix Infer(const Matrix& input) const;
 
   struct LayerLearnCache {
     const Layer* layer;
@@ -37,29 +40,19 @@ class Layer {
     Matrix activated;
     std::optional<Matrix> pd_cost_weighted_input;
   };
-
-  int32_t InputSize() const;
-  int32_t OutputSize() const;
-  const Matrix& Weights() const;
-  const Matrix& Biases() const;
-
   Matrix FeedForward(const Matrix& input, LayerLearnCache* cache) const;
-
-  void CalcPDCostWeightedInputOutput(LayerLearnCache* cache, const Matrix& expected_output) const;
+  void CalcPDCostWeightedInputOutput(
+      const TrainParameters& train_params, LayerLearnCache* cache, const Matrix& expected_output) const;
   void CalcPDCostWeightedInputIntermed(LayerLearnCache* cache, LayerLearnCache* next_cache) const;
   std::pair<Matrix, Matrix> FinishBackPropagate(LayerLearnCache* cache) const;
-  void ApplyGradients(const std::pair<Matrix, Matrix>& gradients);
+  void ApplyGradients(const TrainParameters& train_params, std::pair<Matrix, Matrix> gradients);
 
  private:
   Matrix weights_;
   Matrix biases_;
   Matrix weight_velocities_;
   Matrix bias_velocities_;
-  Activation activation_;
-  Cost cost_;
-  double learn_rate_;
-  double momentum_;
-  double regularization_;
+  protos::Activation activation_;
 };
 
 #endif

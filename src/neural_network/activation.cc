@@ -4,7 +4,11 @@
 #include <functional>
 
 #include "absl/log/check.h"
+#include "absl/status/status.h"
+#include "absl/status/statusor.h"
+#include "absl/strings/string_view.h"
 #include "src/common/matrix.h"
+#include "src/protos/model_checkpoint.pb.h"
 
 Matrix Sigmoid(const Matrix& m) {
   DCHECK(m.RowCount() == 1);
@@ -106,24 +110,35 @@ Matrix SoftmaxDeriv(const Matrix& m) {
   return result;
 }
 
-std::function<Matrix(const Matrix&)> GetActivation(Activation activation) {
-  using enum Activation;
+std::function<Matrix(const Matrix&)> GetActivation(protos::Activation activation) {
   switch (activation) {
-    case SIGMOID: { return Sigmoid; }
-    case RELU: { return ReLU; }
-    case TANH: { return TanH; }
-    case SOFTMAX: { return Softmax; }
+    case protos::Activation::SIGMOID: { return Sigmoid; }
+    case protos::Activation::RELU: { return ReLU; }
+    case protos::Activation::TANH: { return TanH; }
+    case protos::Activation::SOFTMAX: { return Softmax; }
     default: { CHECK(false); return Sigmoid; }
   }
 }
 
-std::function<Matrix(const Matrix&)> GetActivationDeriv(Activation activation) {
-  using enum Activation;
+std::function<Matrix(const Matrix&)> GetActivationDeriv(protos::Activation activation) {
   switch (activation) {
-    case SIGMOID: { return SigmoidDeriv; }
-    case RELU: { return ReLUDeriv; }
-    case TANH: { return TanHDeriv; }
-    case SOFTMAX: { return SoftmaxDeriv; }
+    case protos::Activation::SIGMOID: { return SigmoidDeriv; }
+    case protos::Activation::RELU: { return ReLUDeriv; }
+    case protos::Activation::TANH: { return TanHDeriv; }
+    case protos::Activation::SOFTMAX: { return SoftmaxDeriv; }
     default: { CHECK(false); return SigmoidDeriv; }
   }
+}
+
+absl::string_view ActivationToString(protos::Activation activation) {
+  absl::string_view activation_str = protos::Activation_Name(activation);
+  DCHECK(!activation_str.empty());
+  return activation_str;
+}
+
+absl::StatusOr<protos::Activation> ActivationFromString(std::string activation_str) {
+  protos::Activation activation;
+  if (protos::Activation_Parse(activation_str, &activation)) { return activation; }
+  return absl::InvalidArgumentError(absl::StrCat(
+        "Failed to parse activation type from: ", activation_str, "."));
 }

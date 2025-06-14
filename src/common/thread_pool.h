@@ -12,7 +12,12 @@
 
 class ThreadPool {
  public:
-  explicit ThreadPool(size_t thread_count = std::thread::hardware_concurrency()) {
+  explicit ThreadPool(size_t thread_count = std::thread::hardware_concurrency()) :
+      threads_(),
+      work_queue_(),
+      work_queue_mutex_(),
+      cv_(),
+      terminate_(false) {
     threads_.reserve(thread_count);
     for (size_t i = 0; i < thread_count; i++) {
       threads_.emplace_back(&ThreadPool::ThreadPoll, this);

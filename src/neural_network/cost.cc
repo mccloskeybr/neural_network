@@ -3,7 +3,12 @@
 #include <cmath>
 #include <functional>
 
+#include "absl/status/status.h"
+#include "absl/status/statusor.h"
 #include "absl/log/check.h"
+#include "absl/strings/string_view.h"
+#include "absl/strings/str_cat.h"
+#include "absl/strings/str_join.h"
 #include "src/common/matrix.h"
 
 Matrix MeanSquaredError(const Matrix& actual, const Matrix& expected) {
@@ -30,3 +35,18 @@ std::function<Matrix(const Matrix&, const Matrix&)> GetCostDeriv(Cost cost) {
   }
 }
 
+absl::string_view CostToString(Cost activation) {
+  return kCostStr[static_cast<int32_t>(activation)];
+}
+
+absl::StatusOr<Cost> CostFromString(std::string cost_str) {
+  using enum Cost;
+  for (int32_t i = 0; i < kCostStr.size(); i++) {
+    if (cost_str == kCostStr[i]) {
+      return static_cast<Cost>(i);
+    }
+  }
+  return absl::InvalidArgumentError(absl::StrCat(
+        "Unrecognized cost: ", cost_str,
+        ". Available types: ", absl::StrJoin(kCostStr, ", ")));
+}

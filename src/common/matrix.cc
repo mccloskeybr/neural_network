@@ -56,6 +56,10 @@ Matrix Matrix::operator*(double scalar) const {
   return result;
 }
 
+void Matrix::operator*=(double scalar) {
+  for (double& element : elements_) { element *= scalar; }
+}
+
 Matrix Matrix::operator+(const Matrix& other) const {
   DCHECK(row_count_ == other.row_count_);
   DCHECK(col_count_ == other.col_count_);

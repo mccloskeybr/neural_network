@@ -32,6 +32,7 @@ class Matrix {
   Matrix operator-(const Matrix& other) const;
   void operator-=(const Matrix& other);
   Matrix operator*(double scalar) const;
+  void operator*=(double scalar);
   Matrix operator*(const Matrix& other) const;
   bool operator==(const Matrix& other) const;
 

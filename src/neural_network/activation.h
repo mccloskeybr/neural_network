@@ -3,16 +3,14 @@
 
 #include <functional>
 
+#include "absl/status/statusor.h"
+#include "absl/strings/string_view.h"
 #include "src/common/matrix.h"
+#include "src/protos/model_checkpoint.pb.h"
 
-enum class Activation {
-  SIGMOID,
-  RELU,
-  TANH,
-  SOFTMAX,
-};
-
-std::function<Matrix(const Matrix&)> GetActivation(Activation activation);
-std::function<Matrix(const Matrix&)> GetActivationDeriv(Activation activation);
+std::function<Matrix(const Matrix&)> GetActivation(protos::Activation activation);
+std::function<Matrix(const Matrix&)> GetActivationDeriv(protos::Activation activation);
+absl::string_view ActivationToString(protos::Activation activation);
+absl::StatusOr<protos::Activation> ActivationFromString(std::string activation_str);
 
 #endif

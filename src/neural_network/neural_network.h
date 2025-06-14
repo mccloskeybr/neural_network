@@ -3,28 +3,33 @@
 
 #include <vector>
 
-#include "src/params.h"
 #include "src/common/matrix.h"
 #include "src/neural_network/layer.h"
+#include "src/neural_network/params.h"
 #include "src/protos/model_checkpoint.pb.h"
 
 class NeuralNetwork {
  public:
-  static NeuralNetwork Random(Parameters params);
+  static NeuralNetwork Random(
+      const std::vector<int32_t> layer_sizes,
+      protos::Activation intermed_activation,
+      protos::Activation output_activation);
   static absl::StatusOr<NeuralNetwork> FromCheckpoint(
-      const protos::ModelCheckpoint& checkpoint_proto, Parameters params);
+      const protos::ModelCheckpoint& checkpoint_proto);
+
+  Matrix Infer(const Matrix& input) const;
 
   struct NetworkLearnCache {
     std::vector<Layer::LayerLearnCache> layer_caches;
   };
-
   Matrix FeedForward(
       const Matrix& input, NetworkLearnCache* cache) const;
   std::vector<std::pair<Matrix, Matrix>> BackPropagate(
-      const Matrix& actual_output, const Matrix& expected_output,
-      NetworkLearnCache* cache) const;
+      const TrainParameters& train_params, NetworkLearnCache* cache,
+      const Matrix& actual_output, const Matrix& expected_output) const;
   void ApplyGradients(
-      const std::vector<std::pair<Matrix, Matrix>>& gradients);
+      const TrainParameters& train_params,
+      std::vector<std::pair<Matrix, Matrix>> gradients);
 
   int32_t LayersCount() const;
   const Layer& GetLayer(int32_t i) const;
@@ -33,10 +38,11 @@ class NeuralNetwork {
 
  protected:
   explicit NeuralNetwork(
-      Parameters params, std::vector<Matrix> weights, std::vector<Matrix> biases);
+      std::vector<Matrix> weights, std::vector<Matrix> biases,
+      protos::Activation intermed_activation,
+      protos::Activation output_activation);
 
  private:
-  Parameters params_;
   std::vector<Layer> layers_;
 };
 

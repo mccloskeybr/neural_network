@@ -8,48 +8,44 @@
 #include "absl/status/status.h"
 #include "absl/status/statusor.h"
 #include "src/common/matrix.h"
+#include "src/protos/model_checkpoint.pb.h"
 
 NeuralNetwork::NeuralNetwork(
-    Parameters params,
-    std::vector<Matrix> weights,
-    std::vector<Matrix> biases) {
+    std::vector<Matrix> weights, std::vector<Matrix> biases,
+      protos::Activation intermed_activation, protos::Activation output_activation) {
   DCHECK(weights.size() == biases.size());
-  params_ = std::move(params);
   layers_.reserve(weights.size());
   for (int32_t i = 0; i < weights.size(); i++) {
-    Activation activation = (i == (weights.size() - 1)) ?
-      params_.output_activation : params_.intermed_activation;
-    layers_.emplace_back(
-        std::move(weights[i]), std::move(biases[i]),
-        activation, params_.cost,
-        params_.learn_rate, params.momentum, params.regularization);
+    auto activation = (i == (weights.size() - 1)) ? output_activation : intermed_activation;
+    layers_.emplace_back(std::move(weights[i]), std::move(biases[i]), activation);
   }
 }
 
-NeuralNetwork NeuralNetwork::Random(Parameters params) {
+NeuralNetwork NeuralNetwork::Random(
+    const std::vector<int32_t> layer_sizes,
+    protos::Activation intermed_activation, protos::Activation output_activation) {
   std::vector<Matrix> weights;
   std::vector<Matrix> biases;
-  weights.reserve(params.layer_sizes.size() - 1);
-  biases.reserve(params.layer_sizes.size() - 1);
-  for (int32_t i = 0; i < params.layer_sizes.size() - 1; i++) {
-    int32_t row_count = params.layer_sizes[i];
-    int32_t col_count = params.layer_sizes[i + 1];
+  weights.reserve(layer_sizes.size() - 1);
+  biases.reserve(layer_sizes.size() - 1);
+  for (int32_t i = 0; i < layer_sizes.size() - 1; i++) {
+    int32_t row_count = layer_sizes[i];
+    int32_t col_count = layer_sizes[i + 1];
     weights.push_back(Matrix::Random(row_count, col_count));
     biases.push_back(Matrix::Random(1, col_count));
   }
-  return NeuralNetwork(std::move(params), std::move(weights), std::move(biases));
+  return NeuralNetwork(std::move(weights), std::move(biases), intermed_activation, output_activation);
 }
 
-absl::StatusOr<NeuralNetwork> NeuralNetwork::FromCheckpoint(
-    const protos::ModelCheckpoint& checkpoint_proto, Parameters params) {
+absl::StatusOr<NeuralNetwork> NeuralNetwork::FromCheckpoint(const protos::ModelCheckpoint& checkpoint_proto) {
   std::vector<Matrix> weights;
   std::vector<Matrix> biases;
   weights.reserve(checkpoint_proto.layers().size() - 1);
   biases.reserve(checkpoint_proto.layers().size() - 1);
 
   for (int32_t i = 0; i < checkpoint_proto.layers().size(); i++) {
-    const protos::ModelCheckpoint::Layer* curr_layer = &checkpoint_proto.layers()[i];
-    const protos::ModelCheckpoint::Layer* next_layer = nullptr;
+    const protos::Layer* curr_layer = &checkpoint_proto.layers()[i];
+    const protos::Layer* next_layer = nullptr;
     if (i < checkpoint_proto.layers().size() - 1) {
       next_layer = &checkpoint_proto.layers()[i + 1];
     }
@@ -69,13 +65,14 @@ absl::StatusOr<NeuralNetwork> NeuralNetwork::FromCheckpoint(
         1, curr_layer->col_count(),
         {curr_layer->biases().begin(), curr_layer->biases().end()}));
   }
-  return NeuralNetwork(std::move(params), std::move(weights), std::move(biases));
+  return NeuralNetwork(std::move(weights), std::move(biases),
+      checkpoint_proto.intermed_activation(), checkpoint_proto.output_activation());
 }
 
 protos::ModelCheckpoint NeuralNetwork::ToCheckpoint() const {
   protos::ModelCheckpoint checkpoint_proto;
   for (const Layer& layer : layers_) {
-    protos::ModelCheckpoint::Layer& layer_proto = *checkpoint_proto.add_layers();;
+    protos::Layer& layer_proto = *checkpoint_proto.add_layers();;
     layer_proto.set_row_count(layer.Weights().RowCount());
     layer_proto.set_col_count(layer.Weights().ColCount());
     *layer_proto.mutable_weights() =
@@ -90,28 +87,33 @@ int32_t NeuralNetwork::LayersCount() const { return layers_.size(); }
 
 const Layer& NeuralNetwork::GetLayer(int32_t i) const { return layers_[i]; }
 
-Matrix NeuralNetwork::FeedForward(const Matrix& input, NetworkLearnCache* cache) const {
-  if (cache != nullptr) {
-    *cache = NetworkLearnCache {
-      .layer_caches = std::vector<Layer::LayerLearnCache>(layers_.size()),
-    };
-  }
+Matrix NeuralNetwork::Infer(const Matrix& input) const {
   Matrix layer_value = input;
   for (int32_t i = 0; i < layers_.size(); i++) {
-    layer_value = layers_[i].FeedForward(
-        layer_value, cache != nullptr ? &cache->layer_caches[i] : nullptr);
+    layer_value = layers_[i].Infer(layer_value);
+  }
+  return layer_value;
+}
+
+Matrix NeuralNetwork::FeedForward(const Matrix& input, NetworkLearnCache* cache) const {
+  *cache = NetworkLearnCache {
+    .layer_caches = std::vector<Layer::LayerLearnCache>(layers_.size()),
+  };
+  Matrix layer_value = input;
+  for (int32_t i = 0; i < layers_.size(); i++) {
+    layer_value = layers_[i].FeedForward(layer_value, &cache->layer_caches[i]);
   }
   return layer_value;
 }
 
 std::vector<std::pair<Matrix, Matrix>> NeuralNetwork::BackPropagate(
-    const Matrix& actual_output, const Matrix& expected_output, NetworkLearnCache* cache) const {
+    const TrainParameters& train_params, NetworkLearnCache* cache,
+    const Matrix& actual_output, const Matrix& expected_output) const {
   DCHECK(cache != nullptr);
   std::vector<std::pair<Matrix, Matrix>> gradients(layers_.size());
-
   int32_t output_idx = layers_.size() - 1;
   layers_[output_idx].CalcPDCostWeightedInputOutput(
-      &cache->layer_caches[output_idx], expected_output);
+      train_params, &cache->layer_caches[output_idx], expected_output);
   gradients[output_idx] = layers_[output_idx].FinishBackPropagate(
       &cache->layer_caches[cache->layer_caches.size() - 1]);
   for (int32_t i = layers_.size() - 2; i >= 0; i--) {
@@ -119,13 +121,14 @@ std::vector<std::pair<Matrix, Matrix>> NeuralNetwork::BackPropagate(
         &cache->layer_caches[i], &cache->layer_caches[i + 1]);
     gradients[i] = layers_[i].FinishBackPropagate(&cache->layer_caches[i]);
   }
-
   return gradients;
 }
 
-void NeuralNetwork::ApplyGradients(const std::vector<std::pair<Matrix, Matrix>>& gradients) {
+void NeuralNetwork::ApplyGradients(
+    const TrainParameters& train_params,
+    std::vector<std::pair<Matrix, Matrix>> gradients) {
   DCHECK(gradients.size() == layers_.size());
   for (int32_t i = 0; i < gradients.size(); i++) {
-    layers_[i].ApplyGradients(gradients[i]);
+    layers_[i].ApplyGradients(train_params, std::move(gradients[i]));
   }
 }

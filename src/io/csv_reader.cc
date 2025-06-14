@@ -16,7 +16,7 @@ absl::StatusOr<CsvReader> CsvReader::Open(std::string filename) {
   std::ifstream file(filename);
   if (!file.is_open()) {
     return absl::InvalidArgumentError(
-        absl::StrCat("Error opening file with path:", filename));
+        absl::StrCat("Error opening file with path: ", filename));
   }
   auto reader = CsvReader(std::move(file));
   reader.Reset();

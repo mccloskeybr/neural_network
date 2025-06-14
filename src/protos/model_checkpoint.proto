@@ -1,12 +1,22 @@
 syntax = "proto3";
 package protos;
 
+message Layer {
+  int32 row_count = 1;
+  int32 col_count = 2;
+  repeated double weights = 3;
+  repeated double biases = 4;
+}
+
+enum Activation {
+  SIGMOID = 0;
+  RELU = 1;
+  TANH = 2;
+  SOFTMAX = 3;
+}
+
 message ModelCheckpoint {
-  message Layer {
-    int32 row_count = 1;
-    int32 col_count = 2;
-    repeated double weights = 3;
-    repeated double biases = 4;
-  }
-  repeated Layer layers = 1;
+  Activation intermed_activation = 1;
+  Activation output_activation = 2;
+  repeated Layer layers = 3;
 }
