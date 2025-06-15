@@ -14,7 +14,6 @@ cc_binary(
     "@abseil-cpp//absl/log:flags",
     "@abseil-cpp//absl/status:statusor",
     "@abseil-cpp//absl/strings:strings",
-    "//src/common:assert",
     "//src/common:matrix",
     "//src/io:csv_reader",
     "//src/io:model_checkpoint",

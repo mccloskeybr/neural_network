@@ -3,12 +3,6 @@ load("@rules_cc//cc:cc_library.bzl", "cc_library")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-  name = "assert",
-  hdrs = ["assert.h"],
-  deps = [],
-)
-
-cc_library(
   name = "matrix",
   hdrs = ["matrix.h"],
   srcs = ["matrix.cc"],
@@ -22,6 +16,7 @@ cc_test(
   srcs = ["matrix_test.cc"],
   deps = [
     ":matrix",
+    "@abseil-cpp//absl/log:log",
     "@googletest//:gtest",
     "@googletest//:gtest_main",
   ],

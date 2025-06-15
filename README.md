@@ -16,4 +16,4 @@ Feature set:
 Dependencies:
 * Built using bazel.
 * Model checkpoints are stored in protobuf format.
-* Uses the absl and googletest libraries.
+* Uses the absl, googletest, and google benchmark libraries.

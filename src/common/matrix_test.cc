@@ -2,6 +2,8 @@
 
 #include <gtest/gtest.h>
 
+#include "absl/log/log.h"
+
 TEST(MatrixTest, AddSucceed) {
   auto a = Matrix(2, 2, {
         1, 1,
@@ -24,7 +26,7 @@ TEST(MatrixTest, ScalarMultiplySucceed) {
         1, 2, 3,
         4, 5, 6,
       });
-  auto expected = Matrix(2, 4, {
+  auto expected = Matrix(2, 3, {
         2, 4, 6,
         8, 10, 12,
       });
@@ -45,6 +47,12 @@ TEST(MatrixTest, MatMultiplySucceed) {
         74, 80, 86, 92,
         173, 188, 203, 218,
       });
+
+  LOG(INFO) << "A:\n" << a.DebugString();
+  LOG(INFO) << "B:\n" << b.DebugString();
+  LOG(INFO) << "Actual:\n" << (a * b).DebugString();
+  LOG(INFO) << "Expected:\n" << expected.DebugString();
+
   EXPECT_TRUE(a * b == expected);
 }
 
@@ -70,7 +78,7 @@ TEST(MatrixTest, HadamardMultiplySucceed) {
         7, 8, 9,
         11, 12, 13,
       });
-  auto expected = Matrix(2, 4, {
+  auto expected = Matrix(2, 3, {
         7, 16, 27,
         44, 60, 78,
       });
@@ -86,7 +94,7 @@ TEST(MatrixTest, HadamardMultiplyInPlaceSucceed) {
         7, 8, 9,
         11, 12, 13,
       });
-  auto expected = Matrix(2, 4, {
+  auto expected = Matrix(2, 3, {
         7, 16, 27,
         44, 60, 78,
       });

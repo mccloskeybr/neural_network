@@ -12,7 +12,8 @@
 
 NeuralNetwork::NeuralNetwork(
     std::vector<Matrix> weights, std::vector<Matrix> biases,
-      protos::Activation intermed_activation, protos::Activation output_activation) {
+    protos::Activation intermed_activation,
+    protos::Activation output_activation) {
   DCHECK(weights.size() == biases.size());
   layers_.reserve(weights.size());
   for (int32_t i = 0; i < weights.size(); i++) {
@@ -23,7 +24,8 @@ NeuralNetwork::NeuralNetwork(
 
 NeuralNetwork NeuralNetwork::Random(
     const std::vector<int32_t> layer_sizes,
-    protos::Activation intermed_activation, protos::Activation output_activation) {
+    protos::Activation intermed_activation,
+    protos::Activation output_activation) {
   std::vector<Matrix> weights;
   std::vector<Matrix> biases;
   weights.reserve(layer_sizes.size() - 1);

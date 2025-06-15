@@ -23,7 +23,7 @@ set "args=%args% --out_model_checkpoint_file_path=Z:\neural_network\data\checkpo
 REM train params
 set "args=%args% --cost=MEAN_SQUARED"
 set "args=%args% --learn_rate=0.01"
-set "args=%args% --momentum=0.0"
+set "args=%args% --momentum=0.1"
 set "args=%args% --regularization=0.0"
 set "args=%args% --train_batch_size=128"
 set "args=%args% --test_batch_size=128"
